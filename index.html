@@ -1,39 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My PWA App</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#3b42f5">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <!-- Favicon (use a simple placeholder) -->
-    <link rel="icon" type="image/png" href="/favicon.png">
-    
-    <!-- PWA Manifest -->
+    <title>Test PWA</title>
     <link rel="manifest" href="/manifest.json">
 </head>
 <body>
-    <div id="app"></div>
-    
-    <!-- Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('SW registered:', reg.scope))
-                    .catch(err => console.log('SW registration failed:', err));
-            });
-        }
-    </script>
-    
-    <!-- Framework 7 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@framework7/idle@latest/dist/css/framework7.css">
-    
-    <!-- Framework 7 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@framework7/idle@latest/dist/js/framework7.js"></script>
+    <h1>Hello!</h1>
 </body>
 </html>

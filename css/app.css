@@ -138,3 +138,12 @@ textarea{
 #basicGroup{
     display:none;
 }
+
+
+input,
+textarea,
+select,
+.item-input,
+.item-input-wrap {
+    color: white !important;
+}

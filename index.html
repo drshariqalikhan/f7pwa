@@ -1,35 +1,74 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>F7 Test</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet"
-          href="https://unpkg.com/framework7/framework7-bundle.min.css">
+  <title>My PWA</title>
+
+  <link rel="manifest" href="manifest.json">
+
+  <meta name="theme-color" content="#2196f3">
+
+  <link rel="stylesheet"
+        href="https://unpkg.com/framework7/framework7-bundle.min.css">
+
+  <style>
+    h1{
+      text-align:center;
+      margin-top:40px;
+    }
+  </style>
 </head>
-
 <body>
 
 <div id="app">
+
+  <div class="view view-main">
+
     <div class="page">
-        <div class="navbar">
-            <div class="navbar-inner">
-                <div class="title">Framework7 Test</div>
-            </div>
+
+      <div class="navbar">
+        <div class="navbar-inner">
+          <div class="title">My Travel App</div>
+        </div>
+      </div>
+
+      <div class="page-content">
+
+        <h1>Hello Framework7</h1>
+
+        <div class="block">
+
+          <a href="#"
+             class="button button-fill"
+             id="testBtn">
+             Click Me
+          </a>
+
         </div>
 
-        <div class="page-content">
-            <div class="block">
-                <h1>Hello Framework7</h1>
-            </div>
-        </div>
+      </div>
+
     </div>
+
+  </div>
+
 </div>
 
 <script src="https://unpkg.com/framework7/framework7-bundle.min.js"></script>
 
 <script>
-console.log("Framework7 loaded:", typeof Framework7);
+const app = new Framework7({
+  name: 'MyPWA',
+  theme: 'auto'
+});
+
+document
+  .getElementById('testBtn')
+  .addEventListener('click', () => {
+    app.dialog.alert('Framework7 is working!');
+  });
 </script>
 
 </body>

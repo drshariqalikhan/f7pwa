@@ -2,19 +2,39 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="stylesheet"
         href="https://unpkg.com/framework7/framework7-bundle.min.css">
-</head>
 
+  <title>F7 Test</title>
+</head>
 <body>
 
-<h1 style="color:red">Loaded</h1>
+<div id="app"></div>
 
 <script src="https://unpkg.com/framework7/framework7-bundle.min.js"></script>
 
 <script>
-alert(typeof Framework7);
+try {
+  const app = new Framework7();
+
+  document.body.insertAdjacentHTML(
+    'beforeend',
+    '<h1 style="color:green">Framework7 Initialized OK</h1>'
+  );
+
+  console.log(app);
+
+} catch(e) {
+
+  document.body.insertAdjacentHTML(
+    'beforeend',
+    '<h1 style="color:red">ERROR</h1><pre>' + e + '</pre>'
+  );
+
+  console.error(e);
+}
 </script>
 
 </body>

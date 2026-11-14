@@ -142,8 +142,12 @@ textarea{
 
 input,
 textarea,
-select,
-.item-input,
-.item-input-wrap {
-    color: white !important;
+select {
+    color: #ffffff !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #aaaaaa !important;
+    opacity: 1;
 }

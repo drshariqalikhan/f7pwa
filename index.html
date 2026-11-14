@@ -1,11 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Test PWA</title>
-    <link rel="manifest" href="/manifest.json">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>My Framework7 PWA</title>
+
+    <link rel="manifest" href="manifest.json">
+
+    <meta name="theme-color" content="#2196f3">
+
+    <!-- Framework7 CSS -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/framework7@8/framework7-bundle.min.css">
+
+    <link rel="stylesheet" href="css/app.css">
 </head>
+
 <body>
-    <h1>Hello!</h1>
+
+<div id="app">
+
+    <div class="view view-main">
+
+        <div class="page">
+
+            <div class="navbar">
+                <div class="navbar-inner">
+                    <div class="title">My PWA</div>
+                </div>
+            </div>
+
+            <div class="page-content">
+
+                <div class="block text-align-center">
+
+                    <h1>Framework7 PWA</h1>
+
+                    <p>
+                        Running from GitHub Pages
+                    </p>
+
+                    <a class="button button-fill">
+                        Test Button
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Framework7 JS -->
+<script src="https://cdn.jsdelivr.net/npm/framework7@8/framework7-bundle.min.js"></script>
+
+<script src="js/app.js"></script>
+
 </body>
 </html>

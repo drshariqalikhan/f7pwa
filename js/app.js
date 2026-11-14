@@ -1,152 +1,211 @@
 const app = new Framework7();
 
-/*
-  Add Header Row
-*/
+const authType =
+document.getElementById("authType");
+
+authType.addEventListener(
+    "change",
+    updateAuthFields
+);
+
+updateAuthFields();
+
 document
-    .getElementById("addHeaderBtn")
-    .addEventListener("click", addHeaderRow);
+.getElementById("addHeaderBtn")
+.addEventListener(
+    "click",
+    addHeaderRow
+);
 
-/*
-  Send Button
-*/
 document
-    .getElementById("sendBtn")
-    .addEventListener("click", sendRequest);
+.getElementById("sendBtn")
+.addEventListener(
+    "click",
+    sendRequest
+);
 
-function addHeaderRow() {
+function updateAuthFields(){
 
-    const row = document.createElement("div");
+    const type = authType.value;
 
-    row.className = "header-row";
+    document
+    .getElementById("tokenGroup")
+    .style.display =
+        (
+            type === "bearer" ||
+            type === "apikey"
+        )
+        ? "block"
+        : "none";
+
+    document
+    .getElementById("basicGroup")
+    .style.display =
+        (
+            type === "basic"
+        )
+        ? "block"
+        : "none";
+}
+
+function addHeaderRow(){
+
+    const row =
+    document.createElement("div");
+
+    row.className =
+    "header-row";
 
     row.innerHTML = `
-        <select class="header-name">
-            <option value="Content-Type">Content-Type</option>
-            <option value="Accept">Accept</option>
-            <option value="Authorization">Authorization</option>
-            <option value="X-API-Key">X-API-Key</option>
-            <option value="User-Agent">User-Agent</option>
-            <option value="Cache-Control">Cache-Control</option>
-        </select>
 
-        <input
-            type="text"
-            class="header-value"
-            placeholder="Value">
+        <div class="header-grid">
 
-        <button
-            class="remove-header button button-small button-outline">
-            X
-        </button>
+            <select class="header-name">
+
+                <option value="Content-Type">
+                    Content-Type
+                </option>
+
+                <option value="Accept">
+                    Accept
+                </option>
+
+                <option value="Authorization">
+                    Authorization
+                </option>
+
+                <option value="X-API-Key">
+                    X-API-Key
+                </option>
+
+                <option value="Cache-Control">
+                    Cache-Control
+                </option>
+
+            </select>
+
+            <input
+                type="text"
+                class="header-value"
+                placeholder="Value">
+
+            <button
+                class="remove-header button button-fill color-red">
+                ✕
+            </button>
+
+        </div>
+
     `;
 
     document
-        .getElementById("headerContainer")
-        .appendChild(row);
+    .getElementById("headerContainer")
+    .appendChild(row);
 
-    row.querySelector(".remove-header")
-        .addEventListener("click", () => {
-            row.remove();
-        });
+    row
+    .querySelector(".remove-header")
+    .addEventListener("click", () => {
+        row.remove();
+    });
 }
 
-/*
-  Build Headers
-*/
-function buildHeaders() {
+document
+.querySelectorAll(".remove-header")
+.forEach(btn => {
+
+    btn.addEventListener("click", e => {
+
+        e.target
+         .closest(".header-row")
+         .remove();
+    });
+
+});
+
+function buildHeaders(){
 
     const headers = {};
 
     document
-        .querySelectorAll(".header-row")
-        .forEach(row => {
+    .querySelectorAll(".header-row")
+    .forEach(row => {
 
-            const name =
-                row.querySelector(".header-name").value;
+        const name =
+            row.querySelector(".header-name").value;
 
-            const value =
-                row.querySelector(".header-value").value.trim();
+        const value =
+            row.querySelector(".header-value").value;
 
-            if (value) {
-                headers[name] = value;
-            }
-        });
+        if(value.trim()){
+
+            headers[name] = value;
+        }
+
+    });
 
     return headers;
 }
 
-/*
-  Apply Authentication
-*/
-function applyAuth(headers) {
+function applyAuth(headers){
 
-    const authType =
-        document.getElementById("authType").value;
+    const type =
+    document
+    .getElementById("authType")
+    .value;
 
-    if (authType === "bearer") {
-
-        const token =
-            document.getElementById("authValue").value.trim();
-
-        if (token) {
-            headers.Authorization =
-                "Bearer " + token;
-        }
-
-    }
-
-    if (authType === "apikey") {
-
-        const apiKey =
-            document.getElementById("authValue").value.trim();
-
-        if (apiKey) {
-            headers["X-API-Key"] = apiKey;
-        }
-
-    }
-
-    if (authType === "basic") {
-
-        const username =
-            document.getElementById("username").value;
-
-        const password =
-            document.getElementById("password").value;
+    if(type === "bearer"){
 
         headers.Authorization =
-            "Basic " +
-            btoa(username + ":" + password);
+        "Bearer " +
+        document
+        .getElementById("authValue")
+        .value;
+    }
+
+    if(type === "apikey"){
+
+        headers["X-API-Key"] =
+        document
+        .getElementById("authValue")
+        .value;
+    }
+
+    if(type === "basic"){
+
+        headers.Authorization =
+        "Basic " +
+        btoa(
+            document.getElementById("username").value +
+            ":" +
+            document.getElementById("password").value
+        );
     }
 }
 
-/*
-  Send Request
-*/
-async function sendRequest() {
+async function sendRequest(){
 
     const url =
-        document.getElementById("url").value.trim();
+    document
+    .getElementById("url")
+    .value
+    .trim();
 
-    const method =
-        document.getElementById("method").value;
+    if(!url){
 
-    const responseBox =
-        document.getElementById("response");
-
-    const metaBox =
-        document.getElementById("meta");
-
-    if (!url) {
-
-        app.dialog.alert("Please enter a URL.");
+        app.dialog.alert(
+            "Enter a URL"
+        );
 
         return;
     }
 
+    const method =
+    document
+    .getElementById("method")
+    .value;
+
     const headers =
-        buildHeaders();
+    buildHeaders();
 
     applyAuth(headers);
 
@@ -155,95 +214,92 @@ async function sendRequest() {
         headers
     };
 
-    if (
-        method !== "GET" &&
-        method !== "DELETE"
-    ) {
+    if(
+       method !== "GET" &&
+       method !== "DELETE"
+    ){
 
         options.body =
-            document.getElementById("body").value;
+        document
+        .getElementById("body")
+        .value;
     }
+
+    const responseBox =
+    document
+    .getElementById("response");
+
+    const metaBox =
+    document
+    .getElementById("meta");
 
     responseBox.textContent =
-        "Sending request...";
-
-    metaBox.innerHTML = "";
+    "Sending...";
 
     const start =
-        performance.now();
+    performance.now();
 
-    try {
+    try{
 
         const response =
-            await fetch(url, options);
+        await fetch(
+            url,
+            options
+        );
 
         const elapsed =
-            Math.round(
-                performance.now() - start
-            );
+        Math.round(
+            performance.now() - start
+        );
 
         const text =
-            await response.text();
+        await response.text();
 
-        let formattedResponse =
-            text;
+        let formatted =
+        text;
 
-        try {
+        try{
 
-            formattedResponse =
-                JSON.stringify(
-                    JSON.parse(text),
-                    null,
-                    2
-                );
+            formatted =
+            JSON.stringify(
+                JSON.parse(text),
+                null,
+                2
+            );
 
-        } catch {
-            // Not JSON
-        }
+        }catch{}
 
         metaBox.innerHTML = `
             <div class="status-box">
-                <b>Status:</b> ${response.status}
+                Status: <b>${response.status}</b>
                 <br>
-                <b>Time:</b> ${elapsed} ms
+                Time: <b>${elapsed}ms</b>
                 <br>
-                <b>Size:</b> ${text.length} bytes
+                Size: <b>${text.length}</b> bytes
             </div>
         `;
 
         responseBox.textContent =
-            formattedResponse;
+        formatted;
 
     }
-    catch (err) {
-
-        metaBox.innerHTML = `
-            <div class="status-box">
-                Request Failed
-            </div>
-        `;
+    catch(error){
 
         responseBox.textContent =
-            "ERROR\n\n" +
-            err.message;
+        error.message;
     }
 }
 
-/*
-  Service Worker
-*/
-if ("serviceWorker" in navigator) {
+if("serviceWorker" in navigator){
 
-    window.addEventListener("load", () => {
+    window.addEventListener(
+        "load",
+        () => {
 
-        navigator.serviceWorker
-            .register("./sw.js")
-            .then(() => {
-                console.log("SW Registered");
-            })
-            .catch(err => {
-                console.error(err);
-            });
+            navigator
+            .serviceWorker
+            .register("./sw.js");
 
-    });
+        }
+    );
 }

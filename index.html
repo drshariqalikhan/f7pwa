@@ -2,27 +2,19 @@
 <html>
 <head>
 
-    <meta charset="utf-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1">
+<title>API Tester</title>
 
-    <title>API Tester</title>
+<link rel="manifest" href="manifest.json">
 
-    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#121212">
 
-    <meta
-        name="theme-color"
-        content="#121212">
+<link rel="stylesheet"
+href="https://unpkg.com/framework7/framework7-bundle.min.css">
 
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/framework7/framework7-bundle.min.css">
-
-    <link
-        rel="stylesheet"
-        href="css/app.css">
+<link rel="stylesheet" href="css/app.css">
 
 </head>
 
@@ -31,47 +23,41 @@
 <div class="page">
 
     <div class="navbar">
-
         <div class="navbar-inner">
-
             <div class="title">
                 API Tester
             </div>
-
         </div>
-
     </div>
 
     <div class="page-content">
 
-        <!-- METHOD + URL -->
+        <!-- REQUEST BAR -->
 
         <div class="block">
 
-            <div class="row">
+            <div class="request-bar">
 
-                <div class="col-30">
+                <select id="method">
 
-                    <select id="method">
+                    <option>GET</option>
+                    <option>POST</option>
+                    <option>PUT</option>
+                    <option>PATCH</option>
+                    <option>DELETE</option>
 
-                        <option>GET</option>
-                        <option>POST</option>
-                        <option>PUT</option>
-                        <option>PATCH</option>
-                        <option>DELETE</option>
+                </select>
 
-                    </select>
+                <input
+                    type="text"
+                    id="url"
+                    placeholder="https://api.example.com">
 
-                </div>
-
-                <div class="col-70">
-
-                    <input
-                        type="text"
-                        id="url"
-                        placeholder="https://api.example.com">
-
-                </div>
+                <button
+                    id="sendBtn"
+                    class="button button-fill">
+                    Send
+                </button>
 
             </div>
 
@@ -105,26 +91,34 @@
 
             </select>
 
-            <br><br>
+            <div id="tokenGroup">
 
-            <input
-                type="text"
-                id="authValue"
-                placeholder="Token / API Key">
+                <br>
 
-            <br><br>
+                <input
+                    type="text"
+                    id="authValue"
+                    placeholder="Token / API Key">
 
-            <input
-                type="text"
-                id="username"
-                placeholder="Username">
+            </div>
 
-            <br><br>
+            <div id="basicGroup">
 
-            <input
-                type="password"
-                id="password"
-                placeholder="Password">
+                <br>
+
+                <input
+                    type="text"
+                    id="username"
+                    placeholder="Username">
+
+                <br><br>
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Password">
+
+            </div>
 
         </div>
 
@@ -140,43 +134,43 @@
 
                 <div class="header-row">
 
-                    <select class="header-name">
+                    <div class="header-grid">
 
-                        <option value="Content-Type">
-                            Content-Type
-                        </option>
+                        <select class="header-name">
 
-                        <option value="Accept">
-                            Accept
-                        </option>
+                            <option value="Content-Type">
+                                Content-Type
+                            </option>
 
-                        <option value="Authorization">
-                            Authorization
-                        </option>
+                            <option value="Accept">
+                                Accept
+                            </option>
 
-                        <option value="X-API-Key">
-                            X-API-Key
-                        </option>
+                            <option value="Authorization">
+                                Authorization
+                            </option>
 
-                        <option value="User-Agent">
-                            User-Agent
-                        </option>
+                            <option value="X-API-Key">
+                                X-API-Key
+                            </option>
 
-                        <option value="Cache-Control">
-                            Cache-Control
-                        </option>
+                            <option value="Cache-Control">
+                                Cache-Control
+                            </option>
 
-                    </select>
+                        </select>
 
-                    <input
-                        type="text"
-                        class="header-value"
-                        value="application/json">
+                        <input
+                            type="text"
+                            class="header-value"
+                            value="application/json">
 
-                    <button
-                        class="remove-header button button-small button-outline">
-                        X
-                    </button>
+                        <button
+                            class="remove-header button button-fill color-red">
+                            ✕
+                        </button>
+
+                    </div>
 
                 </div>
 
@@ -184,13 +178,13 @@
 
             <br>
 
-            <a
-                class="button button-outline"
-                id="addHeaderBtn">
+            <button
+                id="addHeaderBtn"
+                class="button button-outline">
 
                 Add Header
 
-            </a>
+            </button>
 
         </div>
 
@@ -210,21 +204,7 @@
 
         </div>
 
-        <!-- SEND -->
-
-        <div class="block">
-
-            <a
-                class="button button-fill button-large"
-                id="sendBtn">
-
-                Send Request
-
-            </a>
-
-        </div>
-
-        <!-- RESPONSE INFO -->
+        <!-- STATUS -->
 
         <div class="block">
 
@@ -254,13 +234,9 @@ Waiting...
 
 </div>
 
-<script
-src="https://unpkg.com/framework7/framework7-bundle.min.js">
-</script>
+<script src="https://unpkg.com/framework7/framework7-bundle.min.js"></script>
 
-<script
-src="js/app.js">
-</script>
+<script src="js/app.js"></script>
 
 </body>
 </html>

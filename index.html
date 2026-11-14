@@ -1,145 +1,266 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>API Tester</title>
+    <meta charset="utf-8">
 
-  <link rel="manifest" href="manifest.json">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet"
+    <title>API Tester</title>
+
+    <link rel="manifest" href="manifest.json">
+
+    <meta
+        name="theme-color"
+        content="#121212">
+
+    <link
+        rel="stylesheet"
         href="https://unpkg.com/framework7/framework7-bundle.min.css">
 
-  <link rel="stylesheet" href="css/app.css">
+    <link
+        rel="stylesheet"
+        href="css/app.css">
+
 </head>
+
 <body>
 
 <div class="page">
 
-  <div class="navbar">
-    <div class="navbar-inner">
-      <div class="title">API Tester</div>
-    </div>
-  </div>
+    <div class="navbar">
 
-  <div class="page-content">
+        <div class="navbar-inner">
 
-    <div class="block">
+            <div class="title">
+                API Tester
+            </div>
 
-      <div class="row">
-
-        <div class="col-30">
-          <select id="method">
-            <option>GET</option>
-            <option>POST</option>
-            <option>PUT</option>
-            <option>PATCH</option>
-            <option>DELETE</option>
-          </select>
         </div>
 
-        <div class="col-70">
-          <input
-            type="text"
-            id="url"
-            placeholder="https://api.example.com">
+    </div>
+
+    <div class="page-content">
+
+        <!-- METHOD + URL -->
+
+        <div class="block">
+
+            <div class="row">
+
+                <div class="col-30">
+
+                    <select id="method">
+
+                        <option>GET</option>
+                        <option>POST</option>
+                        <option>PUT</option>
+                        <option>PATCH</option>
+                        <option>DELETE</option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-70">
+
+                    <input
+                        type="text"
+                        id="url"
+                        placeholder="https://api.example.com">
+
+                </div>
+
+            </div>
+
         </div>
 
-      </div>
+        <!-- AUTH -->
 
-    </div>
+        <div class="block">
 
-    <div class="block">
+            <div class="section-title">
+                Authentication
+            </div>
 
-      <div class="section-title">
-        Authentication
-      </div>
+            <select id="authType">
 
-      <select id="authType">
-        <option value="none">None</option>
-        <option value="bearer">Bearer Token</option>
-        <option value="basic">Basic Auth</option>
-      </select>
+                <option value="none">
+                    No Authentication
+                </option>
 
-      <br><br>
+                <option value="bearer">
+                    Bearer Token
+                </option>
 
-      <input
-        type="text"
-        id="token"
-        placeholder="Bearer Token">
+                <option value="basic">
+                    Basic Auth
+                </option>
 
-      <br><br>
+                <option value="apikey">
+                    API Key Header
+                </option>
 
-      <input
-        type="text"
-        id="username"
-        placeholder="Username">
+            </select>
 
-      <br><br>
+            <br><br>
 
-      <input
-        type="password"
-        id="password"
-        placeholder="Password">
+            <input
+                type="text"
+                id="authValue"
+                placeholder="Token / API Key">
 
-    </div>
+            <br><br>
 
-    <div class="block">
+            <input
+                type="text"
+                id="username"
+                placeholder="Username">
 
-      <div class="section-title">
-        Headers
-      </div>
+            <br><br>
 
-      <textarea id="headers">
+            <input
+                type="password"
+                id="password"
+                placeholder="Password">
+
+        </div>
+
+        <!-- HEADERS -->
+
+        <div class="block">
+
+            <div class="section-title">
+                Headers
+            </div>
+
+            <div id="headerContainer">
+
+                <div class="header-row">
+
+                    <select class="header-name">
+
+                        <option value="Content-Type">
+                            Content-Type
+                        </option>
+
+                        <option value="Accept">
+                            Accept
+                        </option>
+
+                        <option value="Authorization">
+                            Authorization
+                        </option>
+
+                        <option value="X-API-Key">
+                            X-API-Key
+                        </option>
+
+                        <option value="User-Agent">
+                            User-Agent
+                        </option>
+
+                        <option value="Cache-Control">
+                            Cache-Control
+                        </option>
+
+                    </select>
+
+                    <input
+                        type="text"
+                        class="header-value"
+                        value="application/json">
+
+                    <button
+                        class="remove-header button button-small button-outline">
+                        X
+                    </button>
+
+                </div>
+
+            </div>
+
+            <br>
+
+            <a
+                class="button button-outline"
+                id="addHeaderBtn">
+
+                Add Header
+
+            </a>
+
+        </div>
+
+        <!-- BODY -->
+
+        <div class="block">
+
+            <div class="section-title">
+                Request Body
+            </div>
+
+            <textarea id="body">
 {
-  "Content-Type":"application/json"
+    "hello":"world"
 }
-      </textarea>
+            </textarea>
 
-    </div>
+        </div>
 
-    <div class="block">
+        <!-- SEND -->
 
-      <div class="section-title">
-        Request Body
-      </div>
+        <div class="block">
 
-      <textarea id="body">{}</textarea>
+            <a
+                class="button button-fill button-large"
+                id="sendBtn">
 
-    </div>
+                Send Request
 
-    <div class="block">
+            </a>
 
-      <a class="button button-fill button-large"
-         id="sendBtn">
-          Send Request
-      </a>
+        </div>
 
-    </div>
+        <!-- RESPONSE INFO -->
 
-    <div class="block">
-      <div id="meta"></div>
-    </div>
+        <div class="block">
 
-    <div class="block">
+            <div id="meta"></div>
 
-      <div class="section-title">
-        Response
-      </div>
+        </div>
 
-      <div class="response" id="response">
+        <!-- RESPONSE -->
+
+        <div class="block">
+
+            <div class="section-title">
+                Response
+            </div>
+
+            <div
+                class="response"
+                id="response">
+
 Waiting...
-      </div>
+
+            </div>
+
+        </div>
 
     </div>
-
-  </div>
 
 </div>
 
-<script src="https://unpkg.com/framework7/framework7-bundle.min.js"></script>
-<script src="js/app.js"></script>
+<script
+src="https://unpkg.com/framework7/framework7-bundle.min.js">
+</script>
+
+<script
+src="js/app.js">
+</script>
 
 </body>
 </html>

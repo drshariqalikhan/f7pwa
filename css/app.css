@@ -12,15 +12,28 @@ textarea,
 select{
 
     width:100%;
-    background:#1e1e1e;
-    color:white;
 
-    border:1px solid #333;
+    background:#1e1e1e;
+    color:#ffffff;
+
+    border:1px solid #ffffff;
+
     border-radius:8px;
 
     padding:10px;
 
     box-sizing:border-box;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+
+    outline:none;
+
+    border-color:#58a6ff;
+
+    box-shadow:0 0 8px #58a6ff;
 }
 
 textarea{
@@ -63,4 +76,20 @@ textarea{
     border-radius:8px;
 
     border:1px solid #333;
+}
+
+.header-row{
+
+    display:flex;
+    gap:10px;
+
+    margin-bottom:10px;
+}
+
+.header-row select{
+    flex:1;
+}
+
+.header-row input{
+    flex:2;
 }

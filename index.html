@@ -1,227 +1,145 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>API Tester</title>
+  <title>API Tester</title>
 
-<link rel="stylesheet"
-href="https://unpkg.com/framework7/framework7-bundle.min.css">
+  <link rel="manifest" href="manifest.json">
 
-<style>
-.response {
-    background:#111;
-    color:#00ff88;
-    padding:12px;
-    border-radius:8px;
-    min-height:300px;
-    overflow:auto;
-    white-space:pre-wrap;
-    font-family:monospace;
-}
+  <link rel="stylesheet"
+        href="https://unpkg.com/framework7/framework7-bundle.min.css">
 
-textarea {
-    min-height:150px;
-}
-</style>
-
+  <link rel="stylesheet" href="css/app.css">
 </head>
-
 <body>
 
 <div class="page">
 
-<div class="navbar">
+  <div class="navbar">
     <div class="navbar-inner">
-        <div class="title">API Tester</div>
+      <div class="title">API Tester</div>
     </div>
-</div>
+  </div>
 
-<div class="page-content">
+  <div class="page-content">
 
-<div class="block">
+    <div class="block">
 
-<div class="row">
+      <div class="row">
 
-<div class="col-30">
-<select id="method">
-<option>GET</option>
-<option>POST</option>
-<option>PUT</option>
-<option>PATCH</option>
-<option>DELETE</option>
-</select>
-</div>
+        <div class="col-30">
+          <select id="method">
+            <option>GET</option>
+            <option>POST</option>
+            <option>PUT</option>
+            <option>PATCH</option>
+            <option>DELETE</option>
+          </select>
+        </div>
 
-<div class="col-70">
-<input
-type="text"
-id="url"
-placeholder="https://jsonplaceholder.typicode.com/posts/1">
-</div>
+        <div class="col-70">
+          <input
+            type="text"
+            id="url"
+            placeholder="https://api.example.com">
+        </div>
 
-</div>
+      </div>
 
-</div>
+    </div>
 
-<div class="block">
+    <div class="block">
 
-<h4>Headers (JSON)</h4>
+      <div class="section-title">
+        Authentication
+      </div>
 
-<textarea id="headers">
+      <select id="authType">
+        <option value="none">None</option>
+        <option value="bearer">Bearer Token</option>
+        <option value="basic">Basic Auth</option>
+      </select>
+
+      <br><br>
+
+      <input
+        type="text"
+        id="token"
+        placeholder="Bearer Token">
+
+      <br><br>
+
+      <input
+        type="text"
+        id="username"
+        placeholder="Username">
+
+      <br><br>
+
+      <input
+        type="password"
+        id="password"
+        placeholder="Password">
+
+    </div>
+
+    <div class="block">
+
+      <div class="section-title">
+        Headers
+      </div>
+
+      <textarea id="headers">
 {
   "Content-Type":"application/json"
 }
-</textarea>
+      </textarea>
 
-</div>
+    </div>
 
-<div class="block">
+    <div class="block">
 
-<h4>Request Body</h4>
+      <div class="section-title">
+        Request Body
+      </div>
 
-<textarea id="body">
-{
-}
-</textarea>
+      <textarea id="body">{}</textarea>
 
-</div>
+    </div>
 
-<div class="block">
+    <div class="block">
 
-<a class="button button-fill button-large" id="sendBtn">
-Send Request
-</a>
+      <a class="button button-fill button-large"
+         id="sendBtn">
+          Send Request
+      </a>
 
-</div>
+    </div>
 
-<div class="block">
+    <div class="block">
+      <div id="meta"></div>
+    </div>
 
-<div id="meta"></div>
+    <div class="block">
 
-</div>
+      <div class="section-title">
+        Response
+      </div>
 
-<div class="block">
-
-<h3>Response</h3>
-
-<div class="response" id="response">
+      <div class="response" id="response">
 Waiting...
-</div>
+      </div>
 
-</div>
+    </div>
 
-</div>
+  </div>
 
 </div>
 
 <script src="https://unpkg.com/framework7/framework7-bundle.min.js"></script>
-
-<script>
-
-const app = new Framework7();
-
-document.getElementById("sendBtn")
-.addEventListener("click", sendRequest);
-
-async function sendRequest(){
-
-    const method =
-      document.getElementById("method").value;
-
-    const url =
-      document.getElementById("url").value.trim();
-
-    const responseBox =
-      document.getElementById("response");
-
-    const meta =
-      document.getElementById("meta");
-
-    if(!url){
-        app.dialog.alert("Enter URL");
-        return;
-    }
-
-    let headers = {};
-
-    try{
-        headers =
-        JSON.parse(
-            document.getElementById("headers").value
-        );
-    }catch(e){
-        app.dialog.alert("Headers JSON invalid");
-        return;
-    }
-
-    let bodyText =
-      document.getElementById("body").value;
-
-    const options = {
-        method,
-        headers
-    };
-
-    if(method !== "GET" &&
-       method !== "DELETE"){
-
-        options.body = bodyText;
-    }
-
-    responseBox.textContent = "Loading...";
-
-    const start = performance.now();
-
-    try{
-
-        const response =
-            await fetch(url, options);
-
-        const elapsed =
-            Math.round(
-                performance.now() - start
-            );
-
-        const text =
-            await response.text();
-
-        let formatted;
-
-        try{
-            formatted =
-              JSON.stringify(
-                  JSON.parse(text),
-                  null,
-                  2
-              );
-        }
-        catch{
-            formatted = text;
-        }
-
-        meta.innerHTML =
-        `
-        <b>Status:</b> ${response.status}
-        <br>
-        <b>Time:</b> ${elapsed} ms
-        `;
-
-        responseBox.textContent =
-          formatted;
-
-    }
-    catch(err){
-
-        responseBox.textContent =
-        "ERROR\n\n" + err.message;
-
-    }
-
-}
-
-</script>
+<script src="js/app.js"></script>
 
 </body>
 </html>

@@ -1,305 +1,152 @@
-const app = new Framework7();
-
-const authType =
-document.getElementById("authType");
-
-authType.addEventListener(
-    "change",
-    updateAuthFields
-);
-
-updateAuthFields();
-
-document
-.getElementById("addHeaderBtn")
-.addEventListener(
-    "click",
-    addHeaderRow
-);
-
-document
-.getElementById("sendBtn")
-.addEventListener(
-    "click",
-    sendRequest
-);
-
-function updateAuthFields(){
-
-    const type = authType.value;
-
-    document
-    .getElementById("tokenGroup")
-    .style.display =
-        (
-            type === "bearer" ||
-            type === "apikey"
-        )
-        ? "block"
-        : "none";
-
-    document
-    .getElementById("basicGroup")
-    .style.display =
-        (
-            type === "basic"
-        )
-        ? "block"
-        : "none";
-}
-
-function addHeaderRow(){
-
-    const row =
-    document.createElement("div");
-
-    row.className =
-    "header-row";
-
-    row.innerHTML = `
-
-        <div class="header-grid">
-
-            <select class="header-name">
-
-                <option value="Content-Type">
-                    Content-Type
-                </option>
-
-                <option value="Accept">
-                    Accept
-                </option>
-
-                <option value="Authorization">
-                    Authorization
-                </option>
-
-                <option value="X-API-Key">
-                    X-API-Key
-                </option>
-
-                <option value="Cache-Control">
-                    Cache-Control
-                </option>
-
-            </select>
-
-            <input
-                type="text"
-                class="header-value"
-                placeholder="Value">
-
-            <button
-                class="remove-header button button-fill color-red">
-                ✕
-            </button>
-
-        </div>
-
-    `;
-
-    document
-    .getElementById("headerContainer")
-    .appendChild(row);
-
-    row
-    .querySelector(".remove-header")
-    .addEventListener("click", () => {
-        row.remove();
-    });
-}
-
-document
-.querySelectorAll(".remove-header")
-.forEach(btn => {
-
-    btn.addEventListener("click", e => {
-
-        e.target
-         .closest(".header-row")
-         .remove();
-    });
-
+// Initialize Framework7 in iOS Dark Mode
+const app = new Framework7({
+  el: '#app',
+  theme: 'ios',
+  darkMode: true,
 });
 
-function buildHeaders(){
+document.addEventListener('DOMContentLoaded', () => {
+  const methodEl = document.getElementById('method');
+  const methodWrap = document.querySelector('.method-badge-wrap');
+  const urlEl = document.getElementById('url');
+  const sendBtn = document.getElementById('sendBtn');
 
+  const authTypeEl = document.getElementById('authType');
+  const tokenGroup = document.getElementById('tokenGroup');
+  const authValueEl = document.getElementById('authValue');
+  const basicGroup = document.getElementById('basicGroup');
+  const usernameEl = document.getElementById('username');
+  const passwordEl = document.getElementById('password');
+
+  const headerContainer = document.getElementById('headerContainer');
+  const addHeaderBtn = document.getElementById('addHeaderBtn');
+  const bodyEl = document.getElementById('body');
+  const metaEl = document.getElementById('meta');
+  const responseEl = document.getElementById('response');
+
+  // Update HTTP method badge color
+  methodEl.addEventListener('change', () => {
+    methodWrap.setAttribute('data-method', methodEl.value);
+  });
+
+  // Toggle Authentication input fields
+  authTypeEl.addEventListener('change', () => {
+    const type = authTypeEl.value;
+    tokenGroup.classList.add('display-none');
+    basicGroup.classList.add('display-none');
+
+    if (type === 'bearer' || type === 'apikey') {
+      tokenGroup.classList.remove('display-none');
+    } else if (type === 'basic') {
+      basicGroup.classList.remove('display-none');
+    }
+  });
+
+  // Add new iOS-styled Header row
+  addHeaderBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const li = document.createElement('li');
+    li.className = 'header-row item-content';
+    li.innerHTML = `
+      <div class="item-inner">
+        <div class="header-name-wrap">
+          <select class="header-name">
+            <option value="Content-Type">Content-Type</option>
+            <option value="Accept">Accept</option>
+            <option value="Authorization">Authorization</option>
+            <option value="X-API-Key">X-API-Key</option>
+            <option value="Cache-Control">Cache-Control</option>
+          </select>
+        </div>
+        <input type="text" class="header-value" placeholder="Header value">
+        <button type="button" class="remove-header button button-tonal color-red">✕</button>
+      </div>
+    `;
+    headerContainer.appendChild(li);
+  });
+
+  // Remove Header row via event delegation
+  headerContainer.addEventListener('click', (e) => {
+    const removeBtn = e.target.closest('.remove-header');
+    if (removeBtn) {
+      const row = removeBtn.closest('.header-row');
+      if (row) row.remove();
+    }
+  });
+
+  // Send API Request
+  sendBtn.addEventListener('click', async () => {
+    const url = urlEl.value.trim();
+    const method = methodEl.value;
+
+    if (!url) {
+      app.dialog.alert('Please enter a valid endpoint URL.', 'Missing URL');
+      return;
+    }
+
+    // Collect headers
     const headers = {};
-
-    document
-    .querySelectorAll(".header-row")
-    .forEach(row => {
-
-        const name =
-            row.querySelector(".header-name").value;
-
-        const value =
-            row.querySelector(".header-value").value;
-
-        if(value.trim()){
-
-            headers[name] = value;
-        }
-
+    document.querySelectorAll('.header-row').forEach((row) => {
+      const name = row.querySelector('.header-name').value;
+      const value = row.querySelector('.header-value').value.trim();
+      if (name && value) {
+        headers[name] = value;
+      }
     });
 
-    return headers;
-}
-
-function applyAuth(headers){
-
-    const type =
-    document
-    .getElementById("authType")
-    .value;
-
-    if(type === "bearer"){
-
-        headers.Authorization =
-        "Bearer " +
-        document
-        .getElementById("authValue")
-        .value;
+    // Apply authentication
+    const authType = authTypeEl.value;
+    if (authType === 'bearer' && authValueEl.value.trim()) {
+      headers['Authorization'] = `Bearer ${authValueEl.value.trim()}`;
+    } else if (authType === 'apikey' && authValueEl.value.trim()) {
+      headers['X-API-Key'] = authValueEl.value.trim();
+    } else if (authType === 'basic') {
+      const user = usernameEl.value;
+      const pass = passwordEl.value;
+      headers['Authorization'] = `Basic ${btoa(`${user}:${pass}`)}`;
     }
 
-    if(type === "apikey"){
+    const options = { method, headers };
 
-        headers["X-API-Key"] =
-        document
-        .getElementById("authValue")
-        .value;
+    if (method !== 'GET' && method !== 'HEAD') {
+      options.body = bodyEl.value;
     }
 
-    if(type === "basic"){
+    // Loading state
+    sendBtn.classList.add('disabled');
+    sendBtn.textContent = '...';
+    metaEl.innerHTML = '';
+    responseEl.textContent = 'Sending request...';
 
-        headers.Authorization =
-        "Basic " +
-        btoa(
-            document.getElementById("username").value +
-            ":" +
-            document.getElementById("password").value
-        );
+    const startTime = performance.now();
+
+    try {
+      const res = await fetch(url, options);
+      const duration = Math.round(performance.now() - startTime);
+      const statusClass = res.ok ? 'status-ok' : 'status-err';
+
+      metaEl.innerHTML = `
+        <span class="${statusClass}">HTTP ${res.status} ${res.statusText}</span>
+        <span>${duration} ms</span>
+      `;
+
+      const rawText = await res.text();
+      try {
+        const parsed = JSON.parse(rawText);
+        responseEl.textContent = JSON.stringify(parsed, null, 2);
+      } catch {
+        responseEl.textContent = rawText || '(Empty response body)';
+      }
+    } catch (err) {
+      const duration = Math.round(performance.now() - startTime);
+      metaEl.innerHTML = `
+        <span class="status-err">Network / CORS Error</span>
+        <span>${duration} ms</span>
+      `;
+      responseEl.textContent = err.message;
+    } finally {
+      sendBtn.classList.remove('disabled');
+      sendBtn.textContent = 'Send';
     }
-}
-
-async function sendRequest(){
-
-    const url =
-    document
-    .getElementById("url")
-    .value
-    .trim();
-
-    if(!url){
-
-        app.dialog.alert(
-            "Enter a URL"
-        );
-
-        return;
-    }
-
-    const method =
-    document
-    .getElementById("method")
-    .value;
-
-    const headers =
-    buildHeaders();
-
-    applyAuth(headers);
-
-    const options = {
-        method,
-        headers
-    };
-
-    if(
-       method !== "GET" &&
-       method !== "DELETE"
-    ){
-
-        options.body =
-        document
-        .getElementById("body")
-        .value;
-    }
-
-    const responseBox =
-    document
-    .getElementById("response");
-
-    const metaBox =
-    document
-    .getElementById("meta");
-
-    responseBox.textContent =
-    "Sending...";
-
-    const start =
-    performance.now();
-
-    try{
-
-        const response =
-        await fetch(
-            url,
-            options
-        );
-
-        const elapsed =
-        Math.round(
-            performance.now() - start
-        );
-
-        const text =
-        await response.text();
-
-        let formatted =
-        text;
-
-        try{
-
-            formatted =
-            JSON.stringify(
-                JSON.parse(text),
-                null,
-                2
-            );
-
-        }catch{}
-
-        metaBox.innerHTML = `
-            <div class="status-box">
-                Status: <b>${response.status}</b>
-                <br>
-                Time: <b>${elapsed}ms</b>
-                <br>
-                Size: <b>${text.length}</b> bytes
-            </div>
-        `;
-
-        responseBox.textContent =
-        formatted;
-
-    }
-    catch(error){
-
-        responseBox.textContent =
-        error.message;
-    }
-}
-
-if("serviceWorker" in navigator){
-
-    window.addEventListener(
-        "load",
-        () => {
-
-            navigator
-            .serviceWorker
-            .register("./sw.js");
-
-        }
-    );
-}
+  });
+});

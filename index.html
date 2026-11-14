@@ -1,44 +1,118 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Travel Planner</title>
+<title>API Tester</title>
 
-  <link rel="manifest" href="manifest.json">
+<link rel="stylesheet"
+href="https://unpkg.com/framework7/framework7-bundle.min.css">
 
-  <meta name="theme-color" content="#2196f3">
+<style>
+.response {
+    background:#111;
+    color:#00ff88;
+    padding:12px;
+    border-radius:8px;
+    min-height:300px;
+    overflow:auto;
+    white-space:pre-wrap;
+    font-family:monospace;
+}
 
-  <link rel="stylesheet"
-        href="https://unpkg.com/framework7/framework7-bundle.min.css">
+textarea {
+    min-height:150px;
+}
+</style>
+
 </head>
 
 <body>
 
 <div class="page">
 
-  <div class="navbar">
+<div class="navbar">
     <div class="navbar-inner">
-      <div class="title">Travel Planner</div>
+        <div class="title">API Tester</div>
     </div>
-  </div>
+</div>
 
-  <div class="page-content">
+<div class="page-content">
 
-    <div class="block text-align-center">
+<div class="block">
 
-      <h1>Hello Framework7</h1>
+<div class="row">
 
-      <p>Running from GitHub Pages</p>
+<div class="col-30">
+<select id="method">
+<option>GET</option>
+<option>POST</option>
+<option>PUT</option>
+<option>PATCH</option>
+<option>DELETE</option>
+</select>
+</div>
 
-      <a class="button button-fill" id="testBtn">
-        Test Dialog
-      </a>
+<div class="col-70">
+<input
+type="text"
+id="url"
+placeholder="https://jsonplaceholder.typicode.com/posts/1">
+</div>
 
-    </div>
+</div>
 
-  </div>
+</div>
+
+<div class="block">
+
+<h4>Headers (JSON)</h4>
+
+<textarea id="headers">
+{
+  "Content-Type":"application/json"
+}
+</textarea>
+
+</div>
+
+<div class="block">
+
+<h4>Request Body</h4>
+
+<textarea id="body">
+{
+}
+</textarea>
+
+</div>
+
+<div class="block">
+
+<a class="button button-fill button-large" id="sendBtn">
+Send Request
+</a>
+
+</div>
+
+<div class="block">
+
+<div id="meta"></div>
+
+</div>
+
+<div class="block">
+
+<h3>Response</h3>
+
+<div class="response" id="response">
+Waiting...
+</div>
+
+</div>
+
+</div>
 
 </div>
 
@@ -48,11 +122,104 @@
 
 const app = new Framework7();
 
-document
-  .getElementById('testBtn')
-  .addEventListener('click', () => {
-      app.dialog.alert('Framework7 works!');
-  });
+document.getElementById("sendBtn")
+.addEventListener("click", sendRequest);
+
+async function sendRequest(){
+
+    const method =
+      document.getElementById("method").value;
+
+    const url =
+      document.getElementById("url").value.trim();
+
+    const responseBox =
+      document.getElementById("response");
+
+    const meta =
+      document.getElementById("meta");
+
+    if(!url){
+        app.dialog.alert("Enter URL");
+        return;
+    }
+
+    let headers = {};
+
+    try{
+        headers =
+        JSON.parse(
+            document.getElementById("headers").value
+        );
+    }catch(e){
+        app.dialog.alert("Headers JSON invalid");
+        return;
+    }
+
+    let bodyText =
+      document.getElementById("body").value;
+
+    const options = {
+        method,
+        headers
+    };
+
+    if(method !== "GET" &&
+       method !== "DELETE"){
+
+        options.body = bodyText;
+    }
+
+    responseBox.textContent = "Loading...";
+
+    const start = performance.now();
+
+    try{
+
+        const response =
+            await fetch(url, options);
+
+        const elapsed =
+            Math.round(
+                performance.now() - start
+            );
+
+        const text =
+            await response.text();
+
+        let formatted;
+
+        try{
+            formatted =
+              JSON.stringify(
+                  JSON.parse(text),
+                  null,
+                  2
+              );
+        }
+        catch{
+            formatted = text;
+        }
+
+        meta.innerHTML =
+        `
+        <b>Status:</b> ${response.status}
+        <br>
+        <b>Time:</b> ${elapsed} ms
+        `;
+
+        responseBox.textContent =
+          formatted;
+
+    }
+    catch(err){
+
+        responseBox.textContent =
+        "ERROR\n\n" + err.message;
+
+    }
+
+}
 
 </script>
 

@@ -4,37 +4,56 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <title>Travel Planner</title>
+
+  <link rel="manifest" href="manifest.json">
+
+  <meta name="theme-color" content="#2196f3">
+
   <link rel="stylesheet"
         href="https://unpkg.com/framework7/framework7-bundle.min.css">
-
-  <title>F7 Test</title>
 </head>
+
 <body>
 
-<div id="app"></div>
+<div class="page">
+
+  <div class="navbar">
+    <div class="navbar-inner">
+      <div class="title">Travel Planner</div>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <div class="block text-align-center">
+
+      <h1>Hello Framework7</h1>
+
+      <p>Running from GitHub Pages</p>
+
+      <a class="button button-fill" id="testBtn">
+        Test Dialog
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
 
 <script src="https://unpkg.com/framework7/framework7-bundle.min.js"></script>
 
 <script>
-try {
-  const app = new Framework7();
 
-  document.body.insertAdjacentHTML(
-    'beforeend',
-    '<h1 style="color:green">Framework7 Initialized OK</h1>'
-  );
+const app = new Framework7();
 
-  console.log(app);
+document
+  .getElementById('testBtn')
+  .addEventListener('click', () => {
+      app.dialog.alert('Framework7 works!');
+  });
 
-} catch(e) {
-
-  document.body.insertAdjacentHTML(
-    'beforeend',
-    '<h1 style="color:red">ERROR</h1><pre>' + e + '</pre>'
-  );
-
-  console.error(e);
-}
 </script>
 
 </body>

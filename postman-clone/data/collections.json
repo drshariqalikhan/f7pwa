@@ -1,0 +1,27 @@
+{
+  "collections": [
+    {
+      "id": "1",
+      "name": "My Collections",
+      "requests": []
+    }
+  ],
+  "environments": [
+    {
+      "id": "1",
+      "name": "Development",
+      "variables": {
+        "BASE_URL": "http://localhost:3000",
+        "API_KEY": ""
+      }
+    },
+    {
+      "id": "2",
+      "name": "Production",
+      "variables": {
+        "BASE_URL": "https://api.example.com",
+        "API_KEY": ""
+      }
+    }
+  ]
+}

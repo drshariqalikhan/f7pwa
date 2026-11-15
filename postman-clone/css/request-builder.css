@@ -1,0 +1,308 @@
+/* postman-clone/css/request-builder.css */
+
+/* Request Builder Container */
+.request-builder {
+    padding: 20px;
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* Method Selector */
+.method-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.method-selector label {
+    color: #fff;
+    font-weight: 600;
+    min-width: 80px;
+}
+
+.method-select {
+    flex: 1;
+    padding: 12px 15px;
+    background-color: #2d2d2d;
+    border: 1px solid #3d3d3d;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+
+.method-select:focus {
+    border-color: #5e8aff;
+}
+
+.method-select option {
+    background-color: #2d2d2d;
+    color: #fff;
+}
+
+/* URL Input */
+.url-input-container {
+    margin-bottom: 15px;
+}
+
+.url-input-container label {
+    color: #fff;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.url-input {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: #2d2d2d;
+    border: 1px solid #3d3d3d;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+}
+
+.url-input:focus {
+    border-color: #5e8aff;
+}
+
+/* Section Headers */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.section-header h3 {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Headers Section */
+.headers-section {
+    background-color: #252526;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.headers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.header-item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.header-item input {
+    flex: 1;
+    padding: 8px 12px;
+    background-color: #1e1e1e;
+    border: 1px solid #3d3d3d;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 13px;
+}
+
+.header-item input:focus {
+    outline: none;
+    border-color: #5e8aff;
+}
+
+.btn-remove-header {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #dc3545;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.btn-remove-header:hover {
+    background-color: #c82333;
+}
+
+/* Body Section */
+.body-section {
+    background-color: #252526;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.body-type-selector {
+    display: flex;
+    gap: 8px;
+}
+
+.body-type-selector .btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.body-type-selector .btn.active {
+    background-color: #5e8aff;
+    color: #fff;
+}
+
+.body-type-selector .btn:not(.active) {
+    background-color: #3d3d3d;
+    color: #aaa;
+}
+
+/* Body Editor */
+.body-editor {
+    min-height: 120px;
+}
+
+.body-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    background-color: #1e1e1e;
+    border: 1px solid #3d3d3d;
+    border-radius: 6px;
+    color: #fff;
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 13px;
+    resize: vertical;
+    outline: none;
+}
+
+.body-textarea:focus {
+    border-color: #5e8aff;
+}
+
+.json-formatter {
+    background-color: #1e1e1e;
+    padding: 12px;
+    border-radius: 6px;
+    color: #fff;
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.form-data-editor {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.form-data-editor input {
+    flex: 1;
+    padding: 8px 12px;
+    background-color: #1e1e1e;
+    border: 1px solid #3d3d3d;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 13px;
+}
+
+.form-fields-list {
+    flex: 2;
+    margin-left: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Request Actions */
+.request-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #5e8aff;
+    color: #fff;
+    flex: 2;
+}
+
+.btn-primary:hover {
+    background-color: #4a7bf5;
+}
+
+.btn-secondary {
+    background-color: #3d3d3d;
+    color: #aaa;
+    flex: 1;
+}
+
+.btn-secondary:hover {
+    background-color: #4d4d4d;
+    color: #fff;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+    .request-builder {
+        background-color: #1e1e1e;
+    }
+    
+    .method-select,
+    .url-input,
+    .header-item input,
+    .body-textarea,
+    .json-formatter {
+        background-color: #2d2d2d;
+        color: #fff;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .request-builder {
+        padding: 15px;
+    }
+    
+    .method-selector,
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .method-select,
+    .url-input {
+        width: 100%;
+    }
+    
+    .request-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}

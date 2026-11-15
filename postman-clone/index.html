@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Postman Clone - API Client</title>
+    
+    <!-- Framework7 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7@8.2.0/css/framework7-8.2.0.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/request-builder.css">
+    
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --bg-primary: #1e1e1e;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --accent-color: #5e8aff;
+            --border-color: #3d3d3d;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Framework7 App Container -->
+        <div id="f7-app">
+            <!-- Main View -->
+            <div data-view="main" class="view view-main">
+                
+                <!-- Header Bar -->
+                <div class="header-bar">
+                    <h1>Postman Clone</h1>
+                </div>
+
+                <!-- Request Builder Container -->
+                <div id="request-builder-container"></div>
+
+                <!-- Response Section (placeholder) -->
+                <div class="response-section" style="margin-top: 20px;">
+                    <h3>Response</h3>
+                    <pre id="response-output" style="background: #1e1e1e; padding: 15px; border-radius: 6px; color: #fff;"></pre>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Framework7 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/framework7@8.2.0/js/framework7-8.2.0.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="js/request-builder.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,6 +1,8 @@
 
 <template>
   <div id="app">
+    <!-- Add view-init and data-url directly to the view -->
+    <div class="view view-main view-init" data-url="/page-home/"></div>
 
     <!-- Left panel with cover effect-->
     <div class="panel panel-left panel-cover dark panel-init">

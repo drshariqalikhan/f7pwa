@@ -1,0 +1,18 @@
+{
+  "cwd": "/home/newsweirdo/f7pwa",
+  "type": [
+    "web"
+  ],
+  "name": "f7-hello-world",
+  "framework": "core",
+  "template": "single-view",
+  "bundler": "vite",
+  "cssPreProcessor": false,
+  "theming": {
+    "customColor": false,
+    "color": "#007aff",
+    "darkMode": false,
+    "iconFonts": true
+  },
+  "customBuild": false
+}

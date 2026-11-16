@@ -7,8 +7,8 @@ let engine = null;
 let conversation = null;
 let initPromise = null;
 let SamplerTypeRef = null;
-//1024
-async function imageFileToJpegBlob(file, maxSide = 512){
+
+async function imageFileToJpegBlob(file, maxSide = 768){
     const url = URL.createObjectURL(file);
     try{
         const img = await new Promise((resolve, reject) => {
@@ -88,6 +88,7 @@ async function audioBlobToWavBlob(blob, targetRate = 16000){
 
 async function getOrDownloadModel(url, onStatus){
     if(!navigator.storage?.getDirectory){
+        onStatus?.("Streaming model...", null);
         return url;
     }
 
@@ -100,14 +101,14 @@ async function getOrDownloadModel(url, onStatus){
         const file = await fileHandle.getFile();
         const magic = await file.slice(0, 8).text();
         if(file.size > 0 && magic === "LITERTLM"){
-            onStatus?.("Loading saved model from device...");
+            onStatus?.("Loading saved model from device...", null);
             return file;
         }
         await root.removeEntry(okName).catch(() => {});
         await root.removeEntry(CACHE_FILENAME).catch(() => {});
     }catch(_){}
 
-    onStatus?.("Downloading model 0%...");
+    onStatus?.("Downloading model 0%...", 0);
     const res = await fetch(url);
     const contentType = res.headers.get("content-type") || "";
     if(!res.ok || !res.body || contentType.includes("text/html")){
@@ -129,10 +130,10 @@ async function getOrDownloadModel(url, onStatus){
 
             if(total > 0){
                 const pct = Math.min(99, Math.round((received / total) * 100));
-                onStatus?.(`Downloading ${pct}%...`);
+                onStatus?.(`Downloading model ${pct}%...`, pct);
             }else{
                 const mb = (received / (1024 * 1024)).toFixed(0);
-                onStatus?.(`Downloading ${mb} MB...`);
+                onStatus?.(`Downloading model (${mb} MB)...`, null);
             }
         }
         await writable.close();
@@ -184,28 +185,28 @@ export async function initModel(onStatus){
 
     if(!initPromise){
         initPromise = (async () => {
-            onStatus?.("Loading LiteRT-LM.js...");
+            onStatus?.("Loading LiteRT-LM runtime...", null);
             const { Engine, SamplerType, Backend } = await import(LITERT_LM_CDN);
             SamplerTypeRef = SamplerType;
 
             if(!engine){
                 const modelSource = await getOrDownloadModel(CONFIG.modelUrl, onStatus);
-                onStatus?.("Initializing engine...");
+                onStatus?.("Initializing WebGPU & encoders...", null);
                 engine = await Engine.create({
                     model: modelSource,
                     backend: Backend.GPU_ARTISAN,
-                    visionBackend: Backend.GPU,
+                    visionBackend: Backend.CPU,
                     audioBackend: Backend.CPU,
                     mainExecutorSettings: {
                         maxNumTokens: CONFIG.maxNumTokens,
                         maxNumImages: 2
                     }
                 });
-                console.warn("LiteRT Engine settings:", engine.settings);
             }
 
-            onStatus?.("Starting session...");
+            onStatus?.("Starting session...", null);
             conversation = await createFreshConversation();
+            onStatus?.("Ready", 100);
             return { engine, conversation };
         })();
     }
@@ -217,8 +218,6 @@ export async function initModel(onStatus){
         throw err;
     }
 }
-
-
 
 export async function streamAssistantReply(userText, onChunk, onStatus, attachments = {}){
     const session = await initModel(onStatus);

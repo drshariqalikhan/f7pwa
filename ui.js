@@ -3,6 +3,14 @@ export const f7App = new Framework7({
     theme: "ios"
 });
 
+const splashScreen = document.getElementById("splashScreen");
+const splashAvatar = document.getElementById("splashAvatar");
+const splashTitle = document.getElementById("splashTitle");
+const splashStatus = document.getElementById("splashStatus");
+const splashProgressFill = document.getElementById("splashProgressFill");
+const splashError = document.getElementById("splashError");
+const splashRetryBtn = document.getElementById("splashRetryBtn");
+
 const chatMessages = document.getElementById("chatMessages");
 const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
@@ -17,8 +25,8 @@ const avatarTextEl = document.getElementById("avatarText");
 const clearBtn = document.getElementById("clearBtn");
 
 let isBusy = false;
-let pendingImage = null; // { file, url, name }
-let pendingAudio = null; // { blob, url, durationSec }
+let pendingImage = null;
+let pendingAudio = null;
 let activeUrls = [];
 
 let mediaRecorder = null;
@@ -137,14 +145,53 @@ function stopMicStream(){
     chatInput.placeholder = "Message...";
 }
 
+export function setSplash({ title, avatarText, status, progress, error }){
+    if(title) splashTitle.textContent = title;
+    if(avatarText) splashAvatar.textContent = avatarText;
+    if(status !== undefined) splashStatus.textContent = status;
+
+    if(typeof progress === "number"){
+        splashProgressFill.classList.remove("indeterminate");
+        splashProgressFill.style.width = `${Math.max(0, Math.min(100, progress))}%`;
+    }else if(progress === null){
+        splashProgressFill.classList.add("indeterminate");
+    }
+
+    if(error){
+        splashError.textContent = error;
+        splashError.hidden = false;
+        splashRetryBtn.hidden = false;
+    }else if(error === null){
+        splashError.textContent = "";
+        splashError.hidden = true;
+        splashRetryBtn.hidden = true;
+    }
+}
+
+export function showSplash(){
+    splashScreen.classList.remove("hidden");
+    splashScreen.setAttribute("aria-hidden", "false");
+}
+
+export function hideSplash(){
+    splashScreen.classList.add("hidden");
+    splashScreen.setAttribute("aria-hidden", "true");
+}
+
 export function scrollToBottom(){
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 export function setHeader({ title, assistantName, avatarText, status }){
-    if(title) document.title = title;
+    if(title){
+        document.title = title;
+        splashTitle.textContent = title;
+    }
     if(assistantName) assistantNameEl.textContent = assistantName;
-    if(avatarText) avatarTextEl.textContent = avatarText;
+    if(avatarText){
+        avatarTextEl.textContent = avatarText;
+        splashAvatar.textContent = avatarText;
+    }
     if(status) statusText.textContent = status;
 }
 
@@ -183,7 +230,6 @@ export function addDayDivider(label){
     chatMessages.appendChild(divider);
 }
 
-// Accepts either a plain string OR { text, imageUrl, audioUrl }
 export function addMessage(content, sender, timestamp){
     const payload = typeof content === "string" ? { text: content } : content;
 
@@ -283,7 +329,7 @@ export function hideTyping(){
     if(el) el.remove();
 }
 
-export function bindEvents({ onSend, onClear, onError }){
+export function bindEvents({ onSend, onClear, onError, onRetry }){
     function submitCurrentInput(){
         const text = chatInput.value.trim();
         if(isBusy || mediaRecorder?.state === "recording") return;
@@ -410,5 +456,9 @@ export function bindEvents({ onSend, onClear, onError }){
 
     clearBtn.addEventListener("click", () => {
         onClear();
+    });
+
+    splashRetryBtn.addEventListener("click", () => {
+        onRetry?.();
     });
 }

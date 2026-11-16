@@ -21,21 +21,32 @@ body{
     height:100%;
     background:var(--bg);
     overflow:hidden;
-    font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family:"Plus Jakarta Sans", Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     color:var(--text);
 }
 
-/* LAUNCH SPLASH OVERLAY */
+/* SMALL MODEL DOT + PILL */
+.model-dot{
+    width:7px;
+    height:7px;
+    flex-shrink:0;
+    border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 8px var(--accent);
+}
+
+/* MEMORY-EFFICIENT TYPOGRAPHY SPLASH */
 .splash-overlay{
     position:fixed;
     inset:0;
     z-index:20000;
     display:flex;
+    flex-direction:column;
     align-items:center;
-    justify-content:center;
-    padding:24px;
-    background:radial-gradient(circle at top, #172554 0%, #0f172a 55%, #090d16 100%);
-    transition:opacity .38s ease, visibility .38s ease;
+    justify-content:space-between;
+    padding:calc(32px + env(safe-area-inset-top)) 24px calc(26px + env(safe-area-inset-bottom));
+    background:radial-gradient(circle at 50% 25%, #172554 0%, #0f172a 55%, #070b14 100%);
+    transition:opacity .4s ease, visibility .4s ease;
 }
 
 .splash-overlay.hidden{
@@ -44,61 +55,216 @@ body{
     pointer-events:none;
 }
 
-.splash-card{
+.splash-overlay.gone{
+    display:none;
+}
+
+.splash-top{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:5px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.09);
+}
+
+.splash-brand{
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:.03em;
+    color:#cbd5e1;
+}
+
+.splash-center{
     width:100%;
-    max-width:340px;
-    padding:32px 24px 28px;
-    border-radius:28px;
+    max-width:440px;
+    min-height:170px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     text-align:center;
-    background:rgba(255,255,255,.06);
-    backdrop-filter:blur(30px) saturate(180%);
-    -webkit-backdrop-filter:blur(30px) saturate(180%);
-    border:1px solid rgba(255,255,255,.14);
+}
+
+.splash-story{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+}
+
+.splash-story[hidden],
+.open-sign-stage[hidden]{
+    display:none;
+}
+
+.splash-emoji{
+    font-size:42px;
+    line-height:1;
+    animation:emojiFloat 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes emojiFloat{
+    from{ transform:translateY(2px) scale(1); }
+    to{ transform:translateY(-6px) scale(1.06); }
+}
+
+.splash-headline{
+    font-family:"Space Grotesk", "Plus Jakarta Sans", sans-serif;
+    font-size:clamp(26px, 6.5vw, 38px);
+    font-weight:700;
+    line-height:1.18;
+    letter-spacing:-0.02em;
+    background:linear-gradient(110deg, #ffffff 15%, #99f6e4 50%, #38bdf8 85%, #ffffff 100%);
+    background-size:220% auto;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    animation:textShine 3.2s linear infinite;
+}
+
+.splash-headline.animate-in{
+    animation:phraseIn .42s cubic-bezier(.22,1,.36,1), textShine 3.2s linear infinite;
+}
+
+@keyframes phraseIn{
+    from{
+        opacity:0;
+        transform:translateY(14px) scale(.96);
+        filter:blur(4px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+        filter:blur(0);
+    }
+}
+
+@keyframes textShine{
+    to{ background-position:220% center; }
+}
+
+/* ANIMATED "OPEN FOR BUSINESS" SIGN */
+.open-sign-stage{
+    perspective:700px;
+    animation:phraseIn .35s ease-out;
+}
+
+.sign-hinge{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    transform-origin:top center;
+    animation:signSwing 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes signSwing{
+    0%{ transform:rotate(-2.5deg); }
+    100%{ transform:rotate(2.5deg); }
+}
+
+.sign-cords{
+    width:130px;
+    height:22px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.sign-cords span{
+    width:2px;
+    height:100%;
+    background:linear-gradient(180deg, rgba(148,163,184,.2), #94a3b8);
+}
+
+.sign-board{
+    width:236px;
+    height:92px;
+    position:relative;
+    transform-style:preserve-3d;
+    animation:signFlipOpen .85s .15s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+
+@keyframes signFlipOpen{
+    0%{ transform:rotateX(0deg); }
+    100%{ transform:rotateX(180deg); }
+}
+
+.sign-side{
+    position:absolute;
+    inset:0;
+    border-radius:18px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    font-family:"Space Grotesk", "Plus Jakarta Sans", sans-serif;
+}
+
+.sign-closed{
+    background:linear-gradient(135deg, #ef4444, #b91c1c);
+    color:#fff;
+    font-size:24px;
+    font-weight:700;
+    letter-spacing:3px;
+    border:2px solid #fca5a5;
+    box-shadow:0 14px 36px rgba(239,68,68,.35);
+}
+
+.sign-open{
+    background:linear-gradient(135deg, #042f2e, #0f172a);
+    border:2px solid var(--accent);
+    transform:rotateX(180deg);
     box-shadow:
-        0 20px 60px rgba(0,0,0,.45),
-        inset 0 1px 0 rgba(255,255,255,.15);
+        0 0 32px rgba(0,209,178,.45),
+        inset 0 0 18px rgba(0,209,178,.2);
+    animation:neonGlow 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes neonGlow{
+    from{ box-shadow:0 0 22px rgba(0,209,178,.35), inset 0 0 12px rgba(0,209,178,.15); }
+    to{ box-shadow:0 0 38px rgba(0,209,178,.65), inset 0 0 22px rgba(0,209,178,.3); }
+}
+
+.sign-open-main{
+    font-size:30px;
+    font-weight:700;
+    letter-spacing:5px;
+    color:var(--accent);
+    text-shadow:0 0 12px rgba(0,209,178,.7);
+    line-height:1;
+}
+
+.sign-open-sub{
+    margin-top:5px;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:3.5px;
+    color:#ccfbf1;
+}
+
+/* BOTTOM PROGRESS BAR */
+.splash-bottom{
+    width:100%;
+    max-width:420px;
     display:flex;
     flex-direction:column;
     align-items:center;
 }
 
-.splash-logo{
-    width:68px;
-    height:68px;
-    border-radius:22px;
-    background:linear-gradient(135deg, var(--accent), #0284c7);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:24px;
-    font-weight:800;
-    color:#fff;
-    box-shadow:0 10px 30px rgba(0,209,178,.35);
-    margin-bottom:18px;
-    animation:splashPulse 2s infinite ease-in-out;
-}
-
-@keyframes splashPulse{
-    0%, 100%{ transform:scale(1); box-shadow:0 10px 30px rgba(0,209,178,.35); }
-    50%{ transform:scale(1.04); box-shadow:0 12px 36px rgba(0,209,178,.55); }
-}
-
-.splash-title{
-    margin:0;
-    font-size:21px;
-    font-weight:700;
-    color:#fff;
-}
-
-.splash-subtitle{
-    margin:6px 0 22px;
-    font-size:13px;
+.splash-status{
+    margin-bottom:8px;
+    font-size:12px;
+    font-weight:600;
     color:var(--muted);
+    text-align:center;
+    min-height:16px;
 }
 
 .splash-progress-track{
     width:100%;
-    height:7px;
+    height:6px;
     border-radius:999px;
     background:rgba(255,255,255,.1);
     overflow:hidden;
@@ -115,21 +281,12 @@ body{
 
 .splash-progress-fill.indeterminate{
     width:42% !important;
-    position:relative;
     animation:indeterminateSlide 1.3s infinite ease-in-out;
 }
 
 @keyframes indeterminateSlide{
     0%{ transform:translateX(-110%); }
     100%{ transform:translateX(260%); }
-}
-
-.splash-status{
-    margin-top:14px;
-    font-size:13px;
-    font-weight:500;
-    color:var(--accent);
-    min-height:18px;
 }
 
 .splash-error{
@@ -141,12 +298,13 @@ body{
     color:#fecaca;
     font-size:12px;
     line-height:1.4;
+    text-align:center;
     word-break:break-word;
 }
 
 .splash-retry-btn{
-    margin-top:14px;
-    padding:10px 22px;
+    margin-top:12px;
+    padding:10px 24px;
     border:none;
     border-radius:999px;
     background:linear-gradient(135deg, var(--accent), var(--accent-dark));
@@ -185,52 +343,28 @@ body{
 .chat-header-info{
     display:flex;
     align-items:center;
-    gap:12px;
-}
-
-.avatar{
-    width:36px;
-    height:36px;
-    border-radius:50%;
-    background:linear-gradient(135deg, var(--accent), #0284c7);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-    font-size:15px;
-    color:#fff;
-    position:relative;
-    box-shadow:0 4px 12px rgba(0,209,178,.25);
-}
-
-.avatar .status-dot{
-    position:absolute;
-    bottom:0;
-    right:0;
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    background:var(--accent);
-    border:2px solid #111827;
-    box-shadow:0 0 8px var(--accent);
+    gap:9px;
 }
 
 .header-titles{
     display:flex;
     flex-direction:column;
+    gap:1px;
 }
 
-.header-name{
-    color:#fff;
-    font-weight:700;
-    font-size:16px;
+.model-label{
+    color:#e2e8f0;
+    font-weight:600;
+    font-size:12px;
+    letter-spacing:.02em;
     line-height:1.2;
 }
 
 .header-status{
     color:var(--accent);
-    font-size:12px;
+    font-size:10.5px;
     font-weight:500;
+    line-height:1.1;
 }
 
 .clear-btn{

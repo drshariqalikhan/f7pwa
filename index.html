@@ -6,7 +6,7 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
-<title>Chat PWA</title>
+<title>gemma-4-E2B-it-gpu</title>
 
 <meta name="theme-color" content="#111827">
 <meta name="mobile-web-app-capable" content="yes">
@@ -14,25 +14,52 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Space+Grotesk:wght@700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7/framework7-bundle.min.css">
-<link rel="stylesheet" href="./styles.css?v=6">
+<link rel="stylesheet" href="./styles.css?v=9">
 </head>
 
 <body>
 
 <div id="app">
-    <!-- LAUNCH SPLASH SCREEN -->
+    <!-- ANIMATED TYPOGRAPHY SPLASH -->
     <div id="splashScreen" class="splash-overlay" role="status" aria-live="polite">
-        <div class="splash-card">
-            <div class="splash-logo" id="splashAvatar">G4</div>
-            <h1 class="splash-title" id="splashTitle">Gemma 4 On-Device</h1>
-            <p class="splash-subtitle">On-device Multimodal AI • WebGPU</p>
+        <div class="splash-top">
+            <span class="model-dot"></span>
+            <span class="splash-brand" id="splashTitle">gemma-4-E2B-it-gpu</span>
+        </div>
 
+        <div class="splash-center" id="splashStage" data-scene="1">
+            <!-- Animated morning text -->
+            <div class="splash-story" id="splashStory">
+                <div class="splash-emoji" id="splashEmoji">☀️</div>
+                <div class="splash-headline" id="splashHeadline">Gemma is waking up...</div>
+            </div>
+
+            <!-- Finale: Swinging 3D "OPEN FOR BUSINESS" sign -->
+            <div class="open-sign-stage" id="openSignStage" hidden>
+                <div class="sign-hinge">
+                    <div class="sign-cords">
+                        <span></span><span></span>
+                    </div>
+                    <div class="sign-board">
+                        <div class="sign-side sign-closed">CLOSED</div>
+                        <div class="sign-side sign-open">
+                            <span class="sign-open-main">OPEN</span>
+                            <span class="sign-open-sub">FOR BUSINESS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="splash-bottom">
+            <div class="splash-status" id="splashStatus">Starting up...</div>
             <div class="splash-progress-track">
                 <div class="splash-progress-fill indeterminate" id="splashProgressFill"></div>
             </div>
-
-            <div class="splash-status" id="splashStatus">Starting up...</div>
             <div class="splash-error" id="splashError" hidden></div>
             <button type="button" class="splash-retry-btn" id="splashRetryBtn" hidden>Retry</button>
         </div>
@@ -44,12 +71,9 @@
             <div class="navbar">
                 <div class="navbar-inner">
                     <div class="chat-header-info">
-                        <div class="avatar">
-                            <span id="avatarText">AI</span>
-                            <span class="status-dot"></span>
-                        </div>
+                        <span class="model-dot"></span>
                         <div class="header-titles">
-                            <div class="header-name" id="assistantName">Assistant</div>
+                            <div class="model-label" id="assistantName">gemma-4-E2B-it-gpu</div>
                             <div class="header-status" id="statusText">Online</div>
                         </div>
                     </div>
@@ -113,7 +137,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/framework7/framework7-bundle.min.js"></script>
-<script type="module" src="./app.js?v=6"></script>
+<script type="module" src="./app.js?v=9"></script>
 
 </body>
 </html>

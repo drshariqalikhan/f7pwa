@@ -4,8 +4,12 @@ export const f7App = new Framework7({
 });
 
 const splashScreen = document.getElementById("splashScreen");
-const splashAvatar = document.getElementById("splashAvatar");
 const splashTitle = document.getElementById("splashTitle");
+const splashStage = document.getElementById("splashStage");
+const splashStory = document.getElementById("splashStory");
+const splashEmoji = document.getElementById("splashEmoji");
+const splashHeadline = document.getElementById("splashHeadline");
+const openSignStage = document.getElementById("openSignStage");
 const splashStatus = document.getElementById("splashStatus");
 const splashProgressFill = document.getElementById("splashProgressFill");
 const splashError = document.getElementById("splashError");
@@ -21,13 +25,21 @@ const micBtn = document.getElementById("micBtn");
 const attachmentPreview = document.getElementById("attachmentPreview");
 const statusText = document.getElementById("statusText");
 const assistantNameEl = document.getElementById("assistantName");
-const avatarTextEl = document.getElementById("avatarText");
 const clearBtn = document.getElementById("clearBtn");
+
+const SCENE_TEXT = {
+    1: { emoji: "☀️", text: "Gemma is waking up..." },
+    2: { emoji: "🪥", text: "Brushing her teeth..." },
+    3: { emoji: "🥐", text: "Having breakfast..." },
+    4: { emoji: "🚴‍♀️", text: "Cycling to work..." }
+};
 
 let isBusy = false;
 let pendingImage = null;
 let pendingAudio = null;
 let activeUrls = [];
+let splashGoneTimer = null;
+let lastScene = null;
 
 let mediaRecorder = null;
 let micStream = null;
@@ -145,10 +157,28 @@ function stopMicStream(){
     chatInput.placeholder = "Message...";
 }
 
-export function setSplash({ title, avatarText, status, progress, error }){
+export function setSplash({ title, status, progress, scene, error }){
     if(title) splashTitle.textContent = title;
-    if(avatarText) splashAvatar.textContent = avatarText;
     if(status !== undefined) splashStatus.textContent = status;
+
+    if(scene !== undefined && scene !== lastScene){
+        lastScene = scene;
+        splashStage.dataset.scene = String(scene);
+
+        if(scene === 5){
+            splashStory.hidden = true;
+            openSignStage.hidden = false;
+        }else{
+            openSignStage.hidden = true;
+            splashStory.hidden = false;
+            const info = SCENE_TEXT[scene] || SCENE_TEXT[1];
+            splashEmoji.textContent = info.emoji;
+            splashHeadline.textContent = info.text;
+            splashHeadline.classList.remove("animate-in");
+            void splashHeadline.offsetWidth;
+            splashHeadline.classList.add("animate-in");
+        }
+    }
 
     if(typeof progress === "number"){
         splashProgressFill.classList.remove("indeterminate");
@@ -169,29 +199,36 @@ export function setSplash({ title, avatarText, status, progress, error }){
 }
 
 export function showSplash(){
-    splashScreen.classList.remove("hidden");
-    splashScreen.setAttribute("aria-hidden", "false");
+    if(splashGoneTimer){
+        clearTimeout(splashGoneTimer);
+        splashGoneTimer = null;
+    }
+    lastScene = null;
+    splashScreen.classList.remove("gone");
+    requestAnimationFrame(() => {
+        splashScreen.classList.remove("hidden");
+        splashScreen.setAttribute("aria-hidden", "false");
+    });
 }
 
 export function hideSplash(){
     splashScreen.classList.add("hidden");
     splashScreen.setAttribute("aria-hidden", "true");
+    splashGoneTimer = setTimeout(() => {
+        splashScreen.classList.add("gone");
+    }, 420);
 }
 
 export function scrollToBottom(){
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-export function setHeader({ title, assistantName, avatarText, status }){
+export function setHeader({ title, assistantName, status }){
     if(title){
         document.title = title;
         splashTitle.textContent = title;
     }
     if(assistantName) assistantNameEl.textContent = assistantName;
-    if(avatarText){
-        avatarTextEl.textContent = avatarText;
-        splashAvatar.textContent = avatarText;
-    }
     if(status) statusText.textContent = status;
 }
 

@@ -12,7 +12,7 @@ export const CONFIG = {
     // modelUrl: "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-web.litertlm",
     modelUrl: "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-gpu.litertlm",
     systemPrompt: "You are a helpful and concise assistant.",
-    maxNumTokens: 8192,
-    maxOutputTokens: 2048,
+    maxNumTokens: 4096,//8192,
+    maxOutputTokens: 1024,//2048,
     temperature: 0.7
 };

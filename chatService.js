@@ -7,8 +7,8 @@ let engine = null;
 let conversation = null;
 let initPromise = null;
 let SamplerTypeRef = null;
-
-async function imageFileToJpegBlob(file, maxSide = 1024){
+//1024
+async function imageFileToJpegBlob(file, maxSide = 512){
     const url = URL.createObjectURL(file);
     try{
         const img = await new Promise((resolve, reject) => {
@@ -194,11 +194,11 @@ export async function initModel(onStatus){
                 engine = await Engine.create({
                     model: modelSource,
                     backend: Backend.GPU_ARTISAN,
-                    visionBackend: Backend.CPU,
+                    visionBackend: Backend.GPU,
                     audioBackend: Backend.CPU,
                     mainExecutorSettings: {
                         maxNumTokens: CONFIG.maxNumTokens,
-                        maxNumImages: 5
+                        maxNumImages: 2
                     }
                 });
                 console.warn("LiteRT Engine settings:", engine.settings);
@@ -217,6 +217,8 @@ export async function initModel(onStatus){
         throw err;
     }
 }
+
+
 
 export async function streamAssistantReply(userText, onChunk, onStatus, attachments = {}){
     const session = await initModel(onStatus);

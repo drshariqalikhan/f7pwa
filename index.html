@@ -1,102 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#121212">
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
-    <title>Hello PWA</title>
+<title>Chat PWA</title>
 
-    <!-- Bulma -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+<meta name="theme-color" content="#111827">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <style>
-        :root {
-            --bg: #121212;
-            --card: #1e1e1e;
-            --text: #f5f5f5;
-            --accent: #00d1b2;
-        }
-
-        html, body {
-            height: 100%;
-            background: var(--bg);
-            color: var(--text);
-        }
-
-        .hero.is-fullheight {
-            background: var(--bg);
-        }
-
-        .box {
-            background: var(--card);
-            color: var(--text);
-            border: 1px solid #333;
-        }
-
-        .title,
-        .subtitle,
-        .content {
-            color: var(--text) !important;
-        }
-
-        .status-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--accent);
-            display: inline-block;
-            margin-right: 8px;
-            box-shadow: 0 0 10px var(--accent);
-        }
-    </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7/framework7-bundle.min.css">
+<link rel="stylesheet" href="./styles.css">
 </head>
+
 <body>
 
-<section class="hero is-fullheight">
-    <div class="hero-body">
-        <div class="container">
-            <div class="columns is-centered">
-                <div class="column is-5-desktop is-8-tablet">
+<div id="app">
+    <div class="view view-main">
+        <div class="page">
 
-                    <div class="box has-text-centered">
-
-                        <h1 class="title is-2">
-                            👋 Hello PWA
-                        </h1>
-
-                        <p class="subtitle">
-                            Vanilla JavaScript + Bulma + Dark Mode
-                        </p>
-
-                        <div class="content">
-                            <p>
-                                <span class="status-dot"></span>
-                                App Loaded Successfully
-                            </p>
+            <div class="navbar">
+                <div class="navbar-inner">
+                    <div class="chat-header-info">
+                        <div class="avatar">
+                            <span id="avatarText">AI</span>
+                            <span class="status-dot"></span>
                         </div>
-
-                        <button id="helloBtn" class="button is-primary is-medium">
-                            Click Me
-                        </button>
-
-                        <p id="message" class="mt-4"></p>
-
+                        <div class="header-titles">
+                            <div class="header-name" id="assistantName">Assistant</div>
+                            <div class="header-status" id="statusText">Online</div>
+                        </div>
                     </div>
 
+                    <button class="clear-btn" id="clearBtn" type="button">Clear</button>
                 </div>
             </div>
+
+            <div class="chat-scroll" id="chatMessages"></div>
+
+            <div class="composer-wrap">
+                <div class="attachment-bar" id="attachmentPreview" hidden></div>
+
+                <form class="glass-composer" id="chatForm">
+                    <input type="file" id="imageInput" accept="image/*" hidden>
+
+                    <button
+                        type="button"
+                        id="imageBtn"
+                        class="icon-btn"
+                        aria-label="Attach image"
+                        title="Attach image">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/>
+                        </svg>
+                    </button>
+
+                    <textarea
+                        id="chatInput"
+                        class="chat-input"
+                        rows="1"
+                        placeholder="Message..."
+                        autocomplete="off"></textarea>
+
+                    <button
+                        type="button"
+                        id="micBtn"
+                        class="icon-btn"
+                        aria-label="Record voice"
+                        title="Record voice">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a1 1 0 1 0-2 0 3 3 0 0 1-6 0 1 1 0 1 0-2 0 5 5 0 0 0 4 4.9V19H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-3.1A5 5 0 0 0 17 11z"/>
+                        </svg>
+                    </button>
+
+                    <button
+                        type="submit"
+                        id="sendBtn"
+                        class="send-btn"
+                        aria-label="Send message"
+                        disabled>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
         </div>
     </div>
-</section>
+</div>
 
-<script>
-document.getElementById("helloBtn").addEventListener("click", () => {
-    document.getElementById("message").textContent =
-        "🚀 Hello from Vanilla JavaScript!";
-});
-</script>
+<script src="https://cdn.jsdelivr.net/npm/framework7/framework7-bundle.min.js"></script>
+<script type="module" src="./app.js"></script>
 
 </body>
 </html>

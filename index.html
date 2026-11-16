@@ -13,37 +13,44 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<link rel="icon" href="data:,">
+<link rel="icon" type="image/png" href="./icons/android/mipmap-mdpi/ic_launcher.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/ios/AppIcon.appiconset/Icon-App-60x60@3x.png">
+<link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Space+Grotesk:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7/framework7-bundle.min.css">
-<link rel="stylesheet" href="./styles.css?v=9">
+<link rel="stylesheet" href="./styles.css?v=15">
 </head>
 
 <body>
 
 <div id="app">
-    <!-- ANIMATED TYPOGRAPHY SPLASH -->
+    <!-- LAUNCH SPLASH OVERLAY -->
     <div id="splashScreen" class="splash-overlay" role="status" aria-live="polite">
-        <div class="splash-top">
-            <span class="model-dot"></span>
-            <span class="splash-brand" id="splashTitle">gemma-4-E2B-it-gpu</span>
+        <!-- TOP BAR OF SPLASH: MODEL PILL + SPLASH GEAR BUTTON -->
+        <div class="splash-top-bar">
+            <div class="splash-pill">
+                <span class="model-dot"></span>
+                <span class="splash-brand" id="splashTitle">gemma-4-E2B-it-gpu</span>
+            </div>
+            <button type="button" class="splash-gear-btn" id="splashSettingsBtn" title="Model settings" aria-label="Model settings">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+            </button>
         </div>
 
         <div class="splash-center" id="splashStage" data-scene="1">
-            <!-- Animated morning text -->
             <div class="splash-story" id="splashStory">
                 <div class="splash-emoji" id="splashEmoji">☀️</div>
                 <div class="splash-headline" id="splashHeadline">Gemma is waking up...</div>
             </div>
 
-            <!-- Finale: Swinging 3D "OPEN FOR BUSINESS" sign -->
             <div class="open-sign-stage" id="openSignStage" hidden>
                 <div class="sign-hinge">
-                    <div class="sign-cords">
-                        <span></span><span></span>
-                    </div>
+                    <div class="sign-cords"><span></span><span></span></div>
                     <div class="sign-board">
                         <div class="sign-side sign-closed">CLOSED</div>
                         <div class="sign-side sign-open">
@@ -65,6 +72,78 @@
         </div>
     </div>
 
+    <!-- SLICK APPLE GLASS SETTINGS MODAL -->
+    <div id="settingsModal" class="modal-backdrop" hidden>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settingsHeading">
+            <div class="modal-header">
+                <div class="modal-title-row">
+                    <span class="settings-title-icon">⚙️</span>
+                    <h2 id="settingsHeading" class="modal-title">Model Settings</h2>
+                </div>
+                <button type="button" id="closeSettingsBtn" class="modal-close-btn" aria-label="Close settings">✕</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- MODEL URL -->
+                <div class="setting-group">
+                    <label for="modelUrlInput" class="setting-label">LiteRT Model URL (.litertlm)</label>
+                    <textarea id="modelUrlInput" class="setting-textarea" rows="2" spellcheck="false" placeholder="https://..."></textarea>
+                    <div class="setting-hint">Direct raw Hugging Face resolve URL to a .litertlm file.</div>
+                    <div class="preset-chips">
+                        <button type="button" class="preset-btn" data-preset="gpu">⚡ GPU + Multimodal</button>
+                        <button type="button" class="preset-btn" data-preset="web">🪶 Web Text-only</button>
+                    </div>
+                </div>
+
+                <!-- BACKEND SELECTORS (AUDIO & VISION) -->
+                <div class="setting-row-inputs">
+                    <div class="setting-group">
+                        <label for="visionBackendSelect" class="setting-label">Vision (Images)</label>
+                        <select id="visionBackendSelect" class="setting-select">
+                            <option value="CPU">CPU (XNNPACK)</option>
+                            <option value="GPU">GPU (WebGPU)</option>
+                            <option value="OFF">Disabled</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label for="audioBackendSelect" class="setting-label">Audio (Voice)</label>
+                        <select id="audioBackendSelect" class="setting-select">
+                            <option value="CPU">CPU (XNNPACK)</option>
+                            <option value="GPU">GPU (WebGPU)</option>
+                            <option value="OFF">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- SYSTEM PROMPT -->
+                <div class="setting-group">
+                    <label for="systemPromptInput" class="setting-label">System Prompt</label>
+                    <textarea id="systemPromptInput" class="setting-textarea" rows="2" placeholder="You are a helpful and concise assistant."></textarea>
+                </div>
+
+                <!-- TOKENS & TEMP -->
+                <div class="setting-row-inputs">
+                    <div class="setting-group">
+                        <label for="maxTokensInput" class="setting-label">Max Output Tokens</label>
+                        <input type="number" id="maxTokensInput" class="setting-input" min="128" max="8192" step="64">
+                    </div>
+
+                    <div class="setting-group">
+                        <label for="tempInput" class="setting-label">Temperature: <span id="tempVal">0.7</span></label>
+                        <input type="range" id="tempInput" class="setting-range" min="0.0" max="1.0" step="0.05">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="resetModelBtn" class="modal-btn secondary">Reset Defaults</button>
+                <button type="button" id="saveModelBtn" class="modal-btn primary">Save & Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CHAT INTERFACE -->
     <div class="view view-main">
         <div class="page">
 
@@ -78,7 +157,15 @@
                         </div>
                     </div>
 
-                    <button class="clear-btn" id="clearBtn" type="button">Clear</button>
+                    <!-- Clean side-by-side actions (NEVER OVERLAPPING) -->
+                    <div class="nav-actions">
+                        <button class="icon-nav-btn" id="settingsBtn" type="button" title="Model settings" aria-label="Model settings">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                            </svg>
+                        </button>
+                        <button class="clear-btn" id="clearBtn" type="button">Clear</button>
+                    </div>
                 </div>
             </div>
 
@@ -137,7 +224,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/framework7/framework7-bundle.min.js"></script>
-<script type="module" src="./app.js?v=9"></script>
+<script type="module" src="./app.js?v=15"></script>
 
 </body>
 </html>

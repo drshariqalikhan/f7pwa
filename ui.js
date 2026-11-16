@@ -3,6 +3,8 @@ export const f7App = new Framework7({
     theme: "ios"
 });
 
+const BOT_ICON_URL = "./icons/android/mipmap-xhdpi/ic_launcher.png";
+
 const splashScreen = document.getElementById("splashScreen");
 const splashTitle = document.getElementById("splashTitle");
 const splashStage = document.getElementById("splashStage");
@@ -14,6 +16,21 @@ const splashStatus = document.getElementById("splashStatus");
 const splashProgressFill = document.getElementById("splashProgressFill");
 const splashError = document.getElementById("splashError");
 const splashRetryBtn = document.getElementById("splashRetryBtn");
+const splashSettingsBtn = document.getElementById("splashSettingsBtn");
+
+const settingsModal = document.getElementById("settingsModal");
+const settingsBtn = document.getElementById("settingsBtn");
+const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+const modelUrlInput = document.getElementById("modelUrlInput");
+const visionBackendSelect = document.getElementById("visionBackendSelect");
+const audioBackendSelect = document.getElementById("audioBackendSelect");
+const systemPromptInput = document.getElementById("systemPromptInput");
+const maxTokensInput = document.getElementById("maxTokensInput");
+const tempInput = document.getElementById("tempInput");
+const tempVal = document.getElementById("tempVal");
+const saveModelBtn = document.getElementById("saveModelBtn");
+const resetModelBtn = document.getElementById("resetModelBtn");
+const presetBtns = document.querySelectorAll(".preset-btn");
 
 const chatMessages = document.getElementById("chatMessages");
 const chatForm = document.getElementById("chatForm");
@@ -157,6 +174,14 @@ function stopMicStream(){
     chatInput.placeholder = "Message...";
 }
 
+function createBotBadge(){
+    const badge = document.createElement("img");
+    badge.className = "bot-badge";
+    badge.src = BOT_ICON_URL;
+    badge.alt = "Gemma";
+    return badge;
+}
+
 export function setSplash({ title, status, progress, scene, error }){
     if(title) splashTitle.textContent = title;
     if(status !== undefined) splashStatus.textContent = status;
@@ -219,6 +244,21 @@ export function hideSplash(){
     }, 420);
 }
 
+export function openSettingsModal(config){
+    modelUrlInput.value = config.modelUrl || "";
+    visionBackendSelect.value = config.visionBackend || "CPU";
+    audioBackendSelect.value = config.audioBackend || "CPU";
+    systemPromptInput.value = config.systemPrompt || "";
+    maxTokensInput.value = config.maxOutputTokens || 2048;
+    tempInput.value = config.temperature ?? 0.7;
+    tempVal.textContent = tempInput.value;
+    settingsModal.hidden = false;
+}
+
+export function closeSettingsModal(){
+    settingsModal.hidden = true;
+}
+
 export function scrollToBottom(){
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
@@ -276,6 +316,10 @@ export function addMessage(content, sender, timestamp){
     const bubble = document.createElement("div");
     bubble.className = "bubble";
 
+    if(sender === "bot"){
+        bubble.appendChild(createBotBadge());
+    }
+
     if(payload.imageUrl){
         const img = document.createElement("img");
         img.className = "bubble-img";
@@ -294,15 +338,10 @@ export function addMessage(content, sender, timestamp){
         activeUrls.push(payload.audioUrl);
     }
 
-    let textTarget = bubble;
-    if(payload.imageUrl || payload.audioUrl){
-        if(payload.text){
-            textTarget = document.createElement("span");
-            textTarget.textContent = payload.text;
-            bubble.appendChild(textTarget);
-        }
-    }else{
-        bubble.textContent = payload.text || "";
+    const textSpan = document.createElement("span");
+    textSpan.textContent = payload.text || "";
+    if(payload.text || sender === "bot"){
+        bubble.appendChild(textSpan);
     }
 
     const time = document.createElement("div");
@@ -314,7 +353,7 @@ export function addMessage(content, sender, timestamp){
     chatMessages.appendChild(row);
     scrollToBottom();
 
-    return textTarget;
+    return textSpan;
 }
 
 export function addSuggestions(labels, onSelect){
@@ -350,11 +389,12 @@ export function showTyping(){
 
     const bubble = document.createElement("div");
     bubble.className = "bubble typing-bubble";
-    bubble.innerHTML = `
+    bubble.appendChild(createBotBadge());
+    bubble.insertAdjacentHTML("beforeend", `
         <span class="typing-dot"></span>
         <span class="typing-dot"></span>
         <span class="typing-dot"></span>
-    `;
+    `);
 
     row.appendChild(bubble);
     chatMessages.appendChild(row);
@@ -366,7 +406,7 @@ export function hideTyping(){
     if(el) el.remove();
 }
 
-export function bindEvents({ onSend, onClear, onError, onRetry }){
+export function bindEvents({ onSend, onClear, onError, onRetry, onOpenSettings, onSaveSettings, onResetSettings }){
     function submitCurrentInput(){
         const text = chatInput.value.trim();
         if(isBusy || mediaRecorder?.state === "recording") return;
@@ -497,5 +537,65 @@ export function bindEvents({ onSend, onClear, onError, onRetry }){
 
     splashRetryBtn.addEventListener("click", () => {
         onRetry?.();
+    });
+
+    // GEAR CLICK HANDLERS (Navbar and Splash Screen)
+    settingsBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        onOpenSettings?.();
+    });
+
+    splashSettingsBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onOpenSettings?.();
+    });
+
+    closeSettingsBtn.addEventListener("click", () => {
+        closeSettingsModal();
+    });
+
+    settingsModal.addEventListener("click", (e) => {
+        if(e.target === settingsModal) closeSettingsModal();
+    });
+
+    tempInput.addEventListener("input", () => {
+        tempVal.textContent = tempInput.value;
+    });
+
+    presetBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const preset = btn.dataset.preset;
+            if(preset === "gpu"){
+                modelUrlInput.value = "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-gpu.litertlm";
+                visionBackendSelect.value = "CPU";
+                audioBackendSelect.value = "CPU";
+            }else if(preset === "web"){
+                modelUrlInput.value = "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-web.litertlm";
+                visionBackendSelect.value = "OFF";
+                audioBackendSelect.value = "OFF";
+            }
+        });
+    });
+
+    saveModelBtn.addEventListener("click", () => {
+        const modelUrl = modelUrlInput.value.trim();
+        const visionBackend = visionBackendSelect.value;
+        const audioBackend = audioBackendSelect.value;
+        const systemPrompt = systemPromptInput.value.trim();
+        const maxOutputTokens = parseInt(maxTokensInput.value, 10) || 2048;
+        const temperature = parseFloat(tempInput.value) || 0.7;
+
+        if(!modelUrl){
+            onError?.("Model URL cannot be empty.");
+            return;
+        }
+
+        closeSettingsModal();
+        onSaveSettings?.({ modelUrl, visionBackend, audioBackend, systemPrompt, maxOutputTokens, temperature });
+    });
+
+    resetModelBtn.addEventListener("click", () => {
+        onResetSettings?.();
     });
 }

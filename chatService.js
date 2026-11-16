@@ -1,12 +1,27 @@
 import { CONFIG } from "./config.js";
 
 const LITERT_LM_CDN = "https://cdn.jsdelivr.net/npm/@litert-lm/core/+esm";
-const CACHE_FILENAME = CONFIG.modelUrl.split("/").pop().split("?")[0] || "model.litertlm";
 
 let engine = null;
 let conversation = null;
 let initPromise = null;
 let SamplerTypeRef = null;
+
+function getCacheFilename(url = CONFIG.modelUrl){
+    return (url.split("/").pop()?.split("?")[0]) || "model.litertlm";
+}
+
+export async function unloadEngine(){
+    if(conversation){
+        try{ conversation.cancel?.(); }catch(_){}
+        conversation = null;
+    }
+    if(engine){
+        try{ await engine.delete?.(); }catch(_){}
+        engine = null;
+    }
+    initPromise = null;
+}
 
 async function imageFileToJpegBlob(file, maxSide = 768){
     const url = URL.createObjectURL(file);
@@ -93,11 +108,12 @@ async function getOrDownloadModel(url, onStatus){
     }
 
     const root = await navigator.storage.getDirectory();
-    const okName = `${CACHE_FILENAME}.ok`;
+    const cacheFilename = getCacheFilename(url);
+    const okName = `${cacheFilename}.ok`;
 
     try{
         await root.getFileHandle(okName);
-        const fileHandle = await root.getFileHandle(CACHE_FILENAME);
+        const fileHandle = await root.getFileHandle(cacheFilename);
         const file = await fileHandle.getFile();
         const magic = await file.slice(0, 8).text();
         if(file.size > 0 && magic === "LITERTLM"){
@@ -105,7 +121,7 @@ async function getOrDownloadModel(url, onStatus){
             return file;
         }
         await root.removeEntry(okName).catch(() => {});
-        await root.removeEntry(CACHE_FILENAME).catch(() => {});
+        await root.removeEntry(cacheFilename).catch(() => {});
     }catch(_){}
 
     onStatus?.("Downloading model 0%...", 0);
@@ -116,7 +132,7 @@ async function getOrDownloadModel(url, onStatus){
     }
 
     const total = Number(res.headers.get("content-length")) || 0;
-    const fileHandle = await root.getFileHandle(CACHE_FILENAME, { create: true });
+    const fileHandle = await root.getFileHandle(cacheFilename, { create: true });
     const writable = await fileHandle.createWritable();
     const reader = res.body.getReader();
 
@@ -153,7 +169,7 @@ async function getOrDownloadModel(url, onStatus){
     }catch(err){
         await writable.abort().catch(() => {});
         await root.removeEntry(okName).catch(() => {});
-        await root.removeEntry(CACHE_FILENAME).catch(() => {});
+        await root.removeEntry(cacheFilename).catch(() => {});
         throw err;
     }
 }
@@ -192,13 +208,23 @@ export async function initModel(onStatus){
             if(!engine){
                 const modelSource = await getOrDownloadModel(CONFIG.modelUrl, onStatus);
                 onStatus?.("Initializing WebGPU & encoders...", null);
+
+                // Resolve user-selected backends
+                const visionBackendSetting = CONFIG.visionBackend === "GPU"
+                    ? Backend.GPU
+                    : (CONFIG.visionBackend === "CPU" ? Backend.CPU : undefined);
+
+                const audioBackendSetting = CONFIG.audioBackend === "GPU"
+                    ? Backend.GPU
+                    : (CONFIG.audioBackend === "CPU" ? Backend.CPU : undefined);
+
                 engine = await Engine.create({
                     model: modelSource,
                     backend: Backend.GPU_ARTISAN,
-                    visionBackend: Backend.CPU,
-                    audioBackend: Backend.CPU,
+                    visionBackend: visionBackendSetting,
+                    audioBackend: audioBackendSetting,
                     mainExecutorSettings: {
-                        maxNumTokens: CONFIG.maxNumTokens,
+                        maxNumTokens: CONFIG.maxNumTokens || 4096,
                         maxNumImages: 2
                     }
                 });
@@ -223,14 +249,10 @@ export async function streamAssistantReply(userText, onChunk, onStatus, attachme
     const session = await initModel(onStatus);
 
     if(attachments.image && session.engine.settings.visionBackend === undefined){
-        throw new Error(
-            `Vision executor was not enabled by WASM (settings=${JSON.stringify(session.engine.settings)}).`
-        );
+        throw new Error("Vision executor is disabled or not included in this model.");
     }
     if(attachments.audio && session.engine.settings.audioBackend === undefined){
-        throw new Error(
-            `Audio executor was not enabled by WASM (settings=${JSON.stringify(session.engine.settings)}).`
-        );
+        throw new Error("Audio executor is disabled or not included in this model.");
     }
 
     const parts = [];

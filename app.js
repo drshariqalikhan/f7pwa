@@ -1,45 +1,17 @@
-import { CONFIG } from "./config.js";
-import * as ui from "./ui.js?v=14";
-import { initModel, streamAssistantReply, resetSession, unloadEngine } from "./chatService.js?v=14";
+import { CONFIG, DEFAULTS, STORAGE_KEY_SETTINGS } from "./config.js";
+import { initModel, streamAssistantReply, resetSession, unloadEngine } from "./chatService.js";
+import * as ui from "./ui.js";
 
-const STORAGE_KEY_SETTINGS = "gemma_pwa_settings_v2";
-
-const DEFAULTS = {
-    modelUrl: CONFIG.modelUrl,
-    visionBackend: "CPU",
-    audioBackend: "CPU",
-    systemPrompt: CONFIG.systemPrompt || "You are a helpful and concise assistant.",
-    maxOutputTokens: CONFIG.maxOutputTokens || 2048,
-    temperature: CONFIG.temperature ?? 0.7
-};
-
-// Set baseline defaults
-CONFIG.visionBackend = DEFAULTS.visionBackend;
-CONFIG.audioBackend = DEFAULTS.audioBackend;
-
-// Load persisted settings
-try{
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY_SETTINGS) || "{}");
-    if(saved.modelUrl) CONFIG.modelUrl = saved.modelUrl;
-    if(saved.visionBackend) CONFIG.visionBackend = saved.visionBackend;
-    if(saved.audioBackend) CONFIG.audioBackend = saved.audioBackend;
-    if(saved.systemPrompt !== undefined) CONFIG.systemPrompt = saved.systemPrompt;
-    if(saved.maxOutputTokens) CONFIG.maxOutputTokens = saved.maxOutputTokens;
-    if(saved.temperature !== undefined) CONFIG.temperature = saved.temperature;
-}catch(_){}
-
-function getModelLabel(url = CONFIG.modelUrl){
-    return (url.split("/").pop()?.split("?")[0] || "gemma-4-E2B")
-        .replace(/\.litertlm$/i, "");
+function getModelLabel(){
+    return CONFIG.model || "openrouter/free";
 }
 
-const GEMMA_GREETINGS = [
-    "Hey there! I'm Gemma—ready whenever you are. What's on your mind today?",
-    "Hello! Gemma here, running right on your device. Ask me anything or share a photo or voice note.",
-    "Hi! Good to see you. I'm Gemma—what shall we explore together?",
-    "Hey! Gemma's shop is open for business. Type a prompt, drop an image, or record a quick voice note!",
-    "Hello from Gemma! Everything here runs locally on your device—how can I help today?",
-    "Hi there! I'm Gemma, warmed up and ready to chat. What are we working on?"
+const BOT_GREETINGS = [
+    "Hey there! Ready whenever you are. What's on your mind today?",
+    "Hello! Connected to OpenRouter. Ask me anything or share a photo or voice note.",
+    "Hi! Good to see you. What shall we explore together?",
+    "Hello! Type a prompt, drop an image, or record a quick note!",
+    "Hi there! All warmed up and ready to chat. What are we working on?"
 ];
 
 let lastGreetingIdx = -1;
@@ -47,16 +19,16 @@ let lastGreetingIdx = -1;
 function getRandomGreeting(){
     let idx;
     do{
-        idx = Math.floor(Math.random() * GEMMA_GREETINGS.length);
-    }while(idx === lastGreetingIdx && GEMMA_GREETINGS.length > 1);
+        idx = Math.floor(Math.random() * BOT_GREETINGS.length);
+    }while(idx === lastGreetingIdx && BOT_GREETINGS.length > 1);
     lastGreetingIdx = idx;
-    return GEMMA_GREETINGS[idx];
+    return BOT_GREETINGS[idx];
 }
 
 async function startNewChat(){
     await resetSession();
     ui.hideTyping();
-    ui.setBusy(false, "On-device (WebGPU)");
+    ui.setBusy(false, "Online (OpenRouter)");
     ui.clearMessages();
     ui.addDayDivider("Today");
     ui.addMessage(getRandomGreeting(), "bot");
@@ -98,21 +70,11 @@ async function handleSend(payload){
         }
     }catch(err){
         ui.hideTyping();
-        ui.addMessage(`⚠️ ${err.message}`, "bot");
+        ui.addMessage(`⚠️  ${err.message}`, "bot");
         console.error(err);
     }finally{
-        ui.setBusy(false, "On-device (WebGPU)");
+        ui.setBusy(false, "Online (OpenRouter)");
     }
-}
-
-function sceneFromProgress(progress, currentScene){
-    if(typeof progress === "number"){
-        if(progress < 25) return 1;
-        if(progress < 50) return 2;
-        if(progress < 75) return 3;
-        return 4;
-    }
-    return currentScene;
 }
 
 async function bootApp(){
@@ -120,84 +82,60 @@ async function bootApp(){
     ui.setHeader({
         title: label,
         assistantName: label,
-        status: "On-device (WebGPU)"
+        status: "Online (OpenRouter)"
     });
 
-    let currentScene = 1;
     ui.showSplash();
     ui.setSplash({
         title: label,
-        status: "Starting up...",
-        progress: null,
-        scene: currentScene,
+        status: "Connecting...",
+        progress: 25,
+        scene: 1,
         error: null
     });
 
-    const sceneTimer = setInterval(() => {
-        if(currentScene < 4){
-            currentScene += 1;
-            ui.setSplash({ scene: currentScene });
-        }
-    }, 1400);
-
     try{
         await initModel((status, progress) => {
-            if(typeof progress === "number"){
-                currentScene = sceneFromProgress(progress, currentScene);
-            }
-            ui.setSplash({ status, progress, scene: currentScene });
+            const scene = progress < 40 ? 1 : (progress < 80 ? 3 : 5);
+            ui.setSplash({ status, progress, scene });
         });
 
-        clearInterval(sceneTimer);
         ui.setSplash({ status: "Ready!", progress: 100, scene: 5 });
-        setTimeout(() => ui.hideSplash(), 1450);
+        setTimeout(() => ui.hideSplash(), 800);
     }catch(err){
-        clearInterval(sceneTimer);
         console.error(err);
         ui.setSplash({
             status: "Initialization failed",
             progress: 0,
-            error: err?.message || "Could not load model."
+            error: err?.message || "Could not connect to OpenRouter."
         });
     }
 }
 
 async function handleSaveSettings(newSettings){
-    const engineNeedsReboot =
-        newSettings.modelUrl !== CONFIG.modelUrl ||
-        newSettings.visionBackend !== CONFIG.visionBackend ||
-        newSettings.audioBackend !== CONFIG.audioBackend;
-
-    CONFIG.modelUrl = newSettings.modelUrl;
-    CONFIG.visionBackend = newSettings.visionBackend;
-    CONFIG.audioBackend = newSettings.audioBackend;
+    CONFIG.model = newSettings.model;
+    CONFIG.apiKey = newSettings.apiKey;
     CONFIG.systemPrompt = newSettings.systemPrompt;
     CONFIG.maxOutputTokens = newSettings.maxOutputTokens;
     CONFIG.temperature = newSettings.temperature;
 
     localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(CONFIG));
-
-    if(engineNeedsReboot){
-        ui.setBusy(true, "Reloading model...");
-        await unloadEngine();
-        await bootApp();
-        await startNewChat();
-    }else{
-        await resetSession();
-        ui.setBusy(false, "On-device (WebGPU)");
+    if(newSettings.apiKey){
+        localStorage.setItem("openrouter_api_key", newSettings.apiKey);
     }
+
+    ui.setBusy(true, "Updating settings...");
+    await unloadEngine();
+    await bootApp();
+    await startNewChat();
 }
 
 async function handleResetSettings(){
     localStorage.removeItem(STORAGE_KEY_SETTINGS);
+    localStorage.removeItem("openrouter_api_key");
     ui.closeSettingsModal();
 
-    CONFIG.modelUrl = DEFAULTS.modelUrl;
-    CONFIG.visionBackend = DEFAULTS.visionBackend;
-    CONFIG.audioBackend = DEFAULTS.audioBackend;
-    CONFIG.systemPrompt = DEFAULTS.systemPrompt;
-    CONFIG.maxOutputTokens = DEFAULTS.maxOutputTokens;
-    CONFIG.temperature = DEFAULTS.temperature;
+    Object.assign(CONFIG, DEFAULTS);
 
     ui.setBusy(true, "Resetting settings...");
     await unloadEngine();
@@ -208,7 +146,7 @@ async function handleResetSettings(){
 ui.bindEvents({
     onSend: handleSend,
     onClear: () => { startNewChat(); },
-    onError: (msg) => ui.addMessage(`⚠️ ${msg}`, "bot"),
+    onError: (msg) => ui.addMessage(`⚠️  ${msg}`, "bot"),
     onRetry: bootApp,
     onOpenSettings: () => ui.openSettingsModal(CONFIG),
     onSaveSettings: handleSaveSettings,

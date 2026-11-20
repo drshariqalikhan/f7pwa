@@ -1,18 +1,26 @@
-export const CONFIG = {
-    appTitle: "Gemma 4 On-Device",
-    assistantName: "Gemma 4 E2B",
-    avatarText: "G4",
-    welcomeMessage: "👋 Hi! Send a message to load Gemma 4 E2B locally in your browser via WebGPU.",
+export const DEFAULTS = {
+    appTitle: "OpenRouter AI Assistant",
+    assistantName: "openrouter/free",
+    avatarText: "AI",
+    welcomeMessage: "👋 Hi! Ready to chat via OpenRouter. Ask anything or attach a photo!",
     starterChips: [
         "Explain quantum computing simply",
         "Write a short haiku",
         "Summarize how on-device AI works"
     ],
-    // Web-optimized Gemma 4 E2B model (~2.34 GB)
-    // modelUrl: "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-web.litertlm",
-    modelUrl: "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-gpu.litertlm",
+    apiUrl: "https://openrouter.ai/api/v1/chat/completions",
+    model: "openrouter/free",
+    apiKey: "",
     systemPrompt: "You are a helpful and concise assistant.",
-    maxNumTokens: 4096,//8192,
-    maxOutputTokens: 1024,//2048,
+    maxOutputTokens: 1024,
     temperature: 0.7
+};
+
+export const STORAGE_KEY_SETTINGS = "f7pwa_settings_openrouter";
+
+const savedSettings = JSON.parse(localStorage.getItem(STORAGE_KEY_SETTINGS) || "{}");
+
+export const CONFIG = {
+    ...DEFAULTS,
+    ...savedSettings
 };

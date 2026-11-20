@@ -21,9 +21,8 @@ const splashSettingsBtn = document.getElementById("splashSettingsBtn");
 const settingsModal = document.getElementById("settingsModal");
 const settingsBtn = document.getElementById("settingsBtn");
 const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+const apiKeyInput = document.getElementById("apiKeyInput");
 const modelUrlInput = document.getElementById("modelUrlInput");
-const visionBackendSelect = document.getElementById("visionBackendSelect");
-const audioBackendSelect = document.getElementById("audioBackendSelect");
 const systemPromptInput = document.getElementById("systemPromptInput");
 const maxTokensInput = document.getElementById("maxTokensInput");
 const tempInput = document.getElementById("tempInput");
@@ -45,8 +44,8 @@ const assistantNameEl = document.getElementById("assistantName");
 const clearBtn = document.getElementById("clearBtn");
 
 const SCENE_TEXT = {
-    1: { emoji: "☀️", text: "Gemma is waking up..." },
-    2: { emoji: "🪥", text: "Brushing her teeth..." },
+    1: { emoji: "☀️", text: "Assistant is waking up..." },
+    2: { emoji: "🔌", text: "Connecting to OpenRouter..." },
     3: { emoji: "🥐", text: "Having breakfast..." },
     4: { emoji: "🚴‍♀️", text: "Cycling to work..." }
 };
@@ -178,7 +177,7 @@ function createBotBadge(){
     const badge = document.createElement("img");
     badge.className = "bot-badge";
     badge.src = BOT_ICON_URL;
-    badge.alt = "Gemma";
+    badge.alt = "Bot";
     return badge;
 }
 
@@ -245,11 +244,10 @@ export function hideSplash(){
 }
 
 export function openSettingsModal(config){
-    modelUrlInput.value = config.modelUrl || "";
-    visionBackendSelect.value = config.visionBackend || "CPU";
-    audioBackendSelect.value = config.audioBackend || "CPU";
+    if(apiKeyInput) apiKeyInput.value = config.apiKey || localStorage.getItem("openrouter_api_key") || "";
+    modelUrlInput.value = config.model || "openrouter/free";
     systemPromptInput.value = config.systemPrompt || "";
-    maxTokensInput.value = config.maxOutputTokens || 2048;
+    maxTokensInput.value = config.maxOutputTokens || 1024;
     tempInput.value = config.temperature ?? 0.7;
     tempVal.textContent = tempInput.value;
     settingsModal.hidden = false;
@@ -539,7 +537,6 @@ export function bindEvents({ onSend, onClear, onError, onRetry, onOpenSettings, 
         onRetry?.();
     });
 
-    // GEAR CLICK HANDLERS (Navbar and Splash Screen)
     settingsBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         onOpenSettings?.();
@@ -566,33 +563,25 @@ export function bindEvents({ onSend, onClear, onError, onRetry, onOpenSettings, 
     presetBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             const preset = btn.dataset.preset;
-            if(preset === "gpu"){
-                modelUrlInput.value = "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-gpu.litertlm";
-                visionBackendSelect.value = "CPU";
-                audioBackendSelect.value = "CPU";
-            }else if(preset === "web"){
-                modelUrlInput.value = "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-web.litertlm";
-                visionBackendSelect.value = "OFF";
-                audioBackendSelect.value = "OFF";
+            if(preset === "free"){
+                modelUrlInput.value = "openrouter/free";
+            }else if(preset === "ernie"){
+                modelUrlInput.value = "baidu/ernie-5.5-flash-preview:free";
+            }else if(preset === "gemma"){
+                modelUrlInput.value = "google/gemma-2-9b-it:free";
             }
         });
     });
 
     saveModelBtn.addEventListener("click", () => {
-        const modelUrl = modelUrlInput.value.trim();
-        const visionBackend = visionBackendSelect.value;
-        const audioBackend = audioBackendSelect.value;
+        const model = modelUrlInput.value.trim() || "openrouter/free";
+        const apiKey = apiKeyInput ? apiKeyInput.value.trim() : "";
         const systemPrompt = systemPromptInput.value.trim();
-        const maxOutputTokens = parseInt(maxTokensInput.value, 10) || 2048;
+        const maxOutputTokens = parseInt(maxTokensInput.value, 10) || 1024;
         const temperature = parseFloat(tempInput.value) || 0.7;
 
-        if(!modelUrl){
-            onError?.("Model URL cannot be empty.");
-            return;
-        }
-
         closeSettingsModal();
-        onSaveSettings?.({ modelUrl, visionBackend, audioBackend, systemPrompt, maxOutputTokens, temperature });
+        onSaveSettings?.({ model, apiKey, systemPrompt, maxOutputTokens, temperature });
     });
 
     resetModelBtn.addEventListener("click", () => {
